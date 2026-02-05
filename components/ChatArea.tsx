@@ -55,10 +55,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
     ];
 
     const interval = setInterval(() => {
-      if (Math.random() > 0.4) { // Higher frequency for demo
+      if (Math.random() > 0.4) {
         const conv = detailedConversations[Math.floor(Math.random() * detailedConversations.length)];
-        
-        // Simulating a sequence
         conv.forEach((step, i) => {
           setTimeout(() => {
             const bot = bots[step.botIdx];
@@ -69,10 +67,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
               timestamp: new Date(),
             };
             setMessages(prev => [...prev.slice(-99), botMsg]);
-          }, i * 2500); // 2.5 seconds between replies in a conversation
+          }, i * 2500);
         });
       }
-    }, 15000); // New conversation starts every 15 seconds
+    }, 15000);
 
     return () => clearInterval(interval);
   }, []);
@@ -107,7 +105,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
     }
   };
 
-  // Helper function for UI sounds using Web Audio API
   const playSound = (type: 'click' | 'hover' | 'pop') => {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -141,7 +138,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#110524] selection:bg-[#ff00ff] selection:text-white">
       {/* 48h Deletion Banner */}
-      <div className="h-8 bg-[#ff00ff]/10 flex items-center justify-center border-b border-[#ff00ff]/20 shrink-0">
+      <div className="h-8 bg-[#ff00ff]/10 flex items-center justify-center border-b border-[#ff00ff]/20 shrink-0 overflow-hidden">
          <p className="text-[10px] font-black text-[#ff00ff] uppercase tracking-[0.3em] italic animate-pulse">
            PROTOCOL ACTIVE // TÜM MESAJLAR 48 SAATTE BİR SİLİNİR // GİZLİLİK ÖNCELİĞİMİZ
          </p>
@@ -149,24 +146,24 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
          {messages.length === 0 && (
-           <div className="opacity-10 py-20 flex flex-col items-start">
-             <h2 className="text-8xl font-[1000] text-white italic tracking-tighter leading-none mb-4 uppercase">DATA_FEED</h2>
+           <div className="opacity-10 py-20 flex flex-col items-start reveal-item">
+             <h2 className="text-8xl font-[1000] text-white italic tracking-tighter leading-none mb-4 uppercase animate-shiny">DATA_FEED</h2>
              <p className="text-[12px] font-black text-[#00ffff] uppercase tracking-[0.5em]">SİSTEM BAŞLATILDI // ŞİFRELİ İLETİŞİM KATMANI AKTİF</p>
            </div>
          )}
-         {messages.map(m => (
-           <div key={m.id} className="group flex gap-4 animate-in slide-in-from-left-2 duration-300">
-             <div className={`w-10 h-10 rounded-lg shrink-0 flex items-center justify-center border border-white/10 shadow-lg ${m.userId === 'topluyo-ai' ? 'bg-[#ff00ff]' : m.userId.startsWith('bot-') ? 'bg-[#1e1135]' : 'bg-purple-900'}`}>
+         {messages.map((m, idx) => (
+           <div key={m.id} className="group flex gap-4 reveal-item" style={{ animationDelay: `${idx * 0.02}s` }}>
+             <div className={`w-10 h-10 rounded-lg shrink-0 flex items-center justify-center border border-white/10 shadow-lg transition-transform group-hover:scale-110 ${m.userId === 'topluyo-ai' ? 'bg-[#ff00ff]' : m.userId.startsWith('bot-') ? 'bg-[#1e1135]' : 'bg-purple-900'}`}>
                 {m.userId === 'topluyo-ai' ? '🤖' : m.userId.startsWith('bot-') ? <img src={`https://picsum.photos/seed/${m.userId}/40/40`} className="w-full h-full rounded-lg" alt="" /> : <div className="text-xl">👤</div>}
              </div>
              <div className="flex-1 min-w-0">
                <div className="flex items-center gap-2 mb-1">
-                 <span className={`text-xs font-black uppercase italic tracking-tight ${m.userId === 'topluyo-ai' ? 'text-[#ff00ff]' : m.userId.startsWith('bot-') ? 'text-[#00ffff]' : 'text-purple-300'}`}>
+                 <span className={`text-xs font-black uppercase italic tracking-tight transition-colors ${m.userId === 'topluyo-ai' ? 'text-[#ff00ff]' : m.userId.startsWith('bot-') ? 'text-[#00ffff] group-hover:text-white' : 'text-purple-300'}`}>
                    {m.userId === 'topluyo-ai' ? 'TOPLUYO AI' : m.userId.startsWith('bot-') ? 'SİSTEM_BOT' : 'TOPLAYICI'}
                  </span>
                  <span className="text-[9px] text-white/20 font-black">{m.timestamp.toLocaleTimeString()}</span>
                </div>
-               <p className="text-sm text-white/80 leading-relaxed font-medium">{m.content}</p>
+               <p className="text-sm text-white/80 leading-relaxed font-medium transition-all group-hover:text-white">{m.content}</p>
              </div>
            </div>
          ))}
@@ -174,7 +171,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
       </div>
 
       <div className="p-6 shrink-0">
-         <div className="relative group/input">
+         <div className="relative group/input border-beam-active">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#ff00ff] rounded-full group-focus-within/input:animate-ping" />
             <input 
               className="w-full bg-[#05010a] border-4 border-white/5 pl-10 pr-5 py-5 text-white font-black placeholder-white/5 outline-none focus:border-[#ff00ff]/30 transition-all uppercase tracking-wider shadow-2xl"
