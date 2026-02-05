@@ -16,45 +16,78 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages]);
 
-  // Enhanced bot message simulation
+  // Enhanced bot message simulation with conversation flows
   useEffect(() => {
     const bots = [
-      { name: 'NeonBot', content: 'Selam millet! Bugün kimler online?', userId: 'bot-1', color: 'text-pink-500' },
-      { name: 'CyberPunker', content: 'Topluyo markete yeni VP kodları gelmiş beyler, kaçırmayın.', userId: 'bot-2', color: 'text-cyan-400' },
-      { name: 'GigaChad_99', content: 'Sesli sohbetteyiz gelin takılalım.', userId: 'bot-3', color: 'text-green-400' },
-      { name: 'MusicMaster', content: '!oynat https://youtube.com/watch?v=dQw4w9WgXcQ', userId: 'bot-music', color: 'text-yellow-400' },
-      { name: 'KodCanavarı', content: 'Yeni temayı gören var mı? Çok punk olmuş.', userId: 'bot-4', color: 'text-purple-400' },
-      { name: 'Slayer_31', content: 'Aga sunucuya yeni roller gelsin artık.', userId: 'bot-5', color: 'text-red-400' },
-      { name: 'AgalarHero', content: 'Yayına geçiyorum beyler hazır olun!', userId: 'bot-6', color: 'text-orange-400' },
+      { name: 'NeonBot', id: 'bot-1', icon: '⚡' },
+      { name: 'CyberPunker', id: 'bot-2', icon: '🎸' },
+      { name: 'GigaChad_99', id: 'bot-3', icon: '💪' },
+      { name: 'MusicMaster', id: 'bot-music', icon: '🎵' },
+      { name: 'KodCanavarı', id: 'bot-4', icon: '💻' },
+      { name: 'Slayer_31', id: 'bot-5', icon: '🔥' },
+      { name: 'AgalarHero', id: 'bot-6', icon: '👑' },
+      { name: 'QuantumVibe', id: 'bot-7', icon: '🌀' },
+      { name: 'DarkByte', id: 'bot-8', icon: '🕶️' },
+    ];
+
+    const detailedConversations = [
+      [
+        { botIdx: 1, text: "Beyler bu geceki turnuvaya kimler katılıyor? Ödül havuzu bayağı genişlemiş diyorlar." },
+        { botIdx: 4, text: "Benim kodlarda ufak bir hata var, onu fixleyebilirsem yetişirim. Slayer sen ne durumdasın?" },
+        { botIdx: 5, text: "Ben hazırım aga. Mouse hassasiyetini falan ayarladım, bu sefer o kupayı Topluyo HQ'ya getireceğiz!" },
+        { botIdx: 2, text: "Aynen valla, geçen seferki gibi lag olmasın da. İnternet sağlayıcımı değiştirdim sırf bu iş için." }
+      ],
+      [
+        { botIdx: 6, text: "Yayındayım! Gelin de iki sohbetin belini kıralım. Yeni mikrofonu deniyoruz." },
+        { botIdx: 0, text: "Hayırlı olsun reis, sesin ipek gibi geliyor valla. Krisp ayarlarını nasıl yaptın?" },
+        { botIdx: 6, text: "Valla Topluyo'nun kendi ses motoru yetiyor ya, ekstradan bir şeye gerek kalmadı." }
+      ],
+      [
+        { botIdx: 7, text: "Marketten aldığım yeni banner nasıl duruyor sizce? Biraz fazla mı neon oldu?" },
+        { botIdx: 8, text: "Bence tam kıvamında. Zaten bu platformun ruhu neon ve punk değil mi? Çok sırıtmamış." },
+        { botIdx: 7, text: "Sağ ol aga, bir dahakine animasyonlu olanlardan deneyeceğim." }
+      ],
+      [
+        { botIdx: 3, text: "Bugün 100 şınav, 100 mekik, 10km koşu... bitti. Şimdi biraz oyun zamanı." },
+        { botIdx: 1, text: "Oha Giga, sen gerçek hayatta da mı kasmaya başladın artık?" },
+        { botIdx: 3, text: "Sağlam kafa sağlam vücutta bulunur kardeşim. Topluyo'da bile dik duracaksın!" }
+      ]
     ];
 
     const interval = setInterval(() => {
-      if (Math.random() > 0.6) { 
-        const bot = bots[Math.floor(Math.random() * bots.length)];
-        const botMsg: Message = {
-          id: 'bot-' + Date.now(),
-          userId: bot.userId,
-          content: bot.content,
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev.slice(-49), botMsg]);
+      if (Math.random() > 0.4) { // Higher frequency for demo
+        const conv = detailedConversations[Math.floor(Math.random() * detailedConversations.length)];
+        
+        // Simulating a sequence
+        conv.forEach((step, i) => {
+          setTimeout(() => {
+            const bot = bots[step.botIdx];
+            const botMsg: Message = {
+              id: 'bot-' + Date.now() + '-' + i,
+              userId: bot.id,
+              content: step.text,
+              timestamp: new Date(),
+            };
+            setMessages(prev => [...prev.slice(-99), botMsg]);
+          }, i * 2500); // 2.5 seconds between replies in a conversation
+        });
       }
-    }, 5000);
+    }, 15000); // New conversation starts every 15 seconds
 
     return () => clearInterval(interval);
   }, []);
 
   const handleSendMessage = async (val: string) => {
+    playSound('click');
     const userMessage: Message = { id: Date.now().toString(), userId: 'me', content: val, timestamp: new Date() };
     setMessages(prev => [...prev, userMessage]);
 
-    // Command Simulation
     if (val.startsWith('!oynat')) {
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: 'bot-music-reply-' + Date.now(),
           userId: 'bot-music',
-          content: '🎵 Oynatılıyor: Rick Astley - Never Gonna Give You Up',
+          content: '🎵 Oynatılıyor: Rick Astley - Never Gonna Give You Up. Ses seviyesi %100. İyi dinlemeler Toplayıcı!',
           timestamp: new Date()
         }]);
       }, 800)
@@ -67,10 +100,41 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
         const response = await ai.models.generateContent({
           model: 'gemini-3-flash-preview',
           contents: val.replace('/topluyo', '').trim() || 'Merhaba!',
-          config: { systemInstruction: 'Sen Topluyo asistanısın. Punk ruhlu, kısa ve öz konuş. Kullanıcılara yardımcı ol.' },
+          config: { systemInstruction: 'Sen Topluyo asistanısın. Punk ruhlu, kısa ve öz konuş. Kullanıcılara yardımcı ol. Argodan kaçınma ama saygılı kal.' },
         });
         setMessages(prev => [...prev, { id: 'ai-' + Date.now(), userId: 'topluyo-ai', content: response.text || 'Error...', timestamp: new Date() }]);
       } catch (err) { console.error(err); } finally { setIsTyping(false); }
+    }
+  };
+
+  // Helper function for UI sounds using Web Audio API
+  const playSound = (type: 'click' | 'hover' | 'pop') => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      if (type === 'click') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+      } else if (type === 'pop') {
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.05);
+      }
+    } catch (e) {
+      console.warn("Audio Context error:", e);
     }
   };
 
@@ -93,7 +157,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId }) => {
          {messages.map(m => (
            <div key={m.id} className="group flex gap-4 animate-in slide-in-from-left-2 duration-300">
              <div className={`w-10 h-10 rounded-lg shrink-0 flex items-center justify-center border border-white/10 shadow-lg ${m.userId === 'topluyo-ai' ? 'bg-[#ff00ff]' : m.userId.startsWith('bot-') ? 'bg-[#1e1135]' : 'bg-purple-900'}`}>
-                {m.userId === 'topluyo-ai' ? '🤖' : m.userId.startsWith('bot-') ? <img src={`https://picsum.photos/seed/${m.userId}/40/40`} className="w-full h-full rounded-lg" alt="" /> : '👤'}
+                {m.userId === 'topluyo-ai' ? '🤖' : m.userId.startsWith('bot-') ? <img src={`https://picsum.photos/seed/${m.userId}/40/40`} className="w-full h-full rounded-lg" alt="" /> : <div className="text-xl">👤</div>}
              </div>
              <div className="flex-1 min-w-0">
                <div className="flex items-center gap-2 mb-1">

@@ -11,11 +11,37 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ servers, activeServerId, onServerSelect, onAddServer, onBackToHub }) => {
+  const playSound = (type: 'click' | 'blip') => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(type === 'click' ? 300 : 800, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.1);
+    } catch(e) {}
+  };
+
+  const handleHubClick = () => {
+    playSound('blip');
+    onBackToHub?.();
+  };
+
+  const handleServerClick = (server: Server) => {
+    playSound('click');
+    onServerSelect(server);
+  };
+
   return (
     <div className="w-[72px] bg-[#0f051a] flex flex-col items-center py-3 gap-2 overflow-y-auto no-scrollbar overflow-x-hidden shrink-0 h-full border-r border-white/5">
       {/* Home / Hub Button */}
       <div 
-        onClick={onBackToHub}
+        onClick={handleHubClick}
         className="group relative flex items-center justify-center w-12 h-12 bg-[#ff00ff] rounded-xl hover:rounded-lg transition-all cursor-pointer text-white shadow-[0_0_15px_rgba(255,0,255,0.3)] shrink-0"
       >
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ servers, activeServerId, onServerSele
         {servers.map(server => (
           <div 
             key={server.id} 
-            onClick={() => onServerSelect(server)}
+            onClick={() => handleServerClick(server)}
             className={`group relative flex items-center justify-center w-12 h-12 transition-all cursor-pointer shrink-0
               ${activeServerId === server.id 
                 ? 'bg-[#ff00ff] rounded-lg' 
@@ -55,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ servers, activeServerId, onServerSele
 
       {/* Add Server Button */}
       <div 
-        onClick={onAddServer}
+        onClick={() => { playSound('blip'); onAddServer(); }}
         className="group relative flex items-center justify-center w-12 h-12 bg-[#1e1135] rounded-xl hover:rounded-lg hover:bg-[#00ffff] transition-all cursor-pointer text-[#00ffff] hover:text-black mt-1 shrink-0 border border-[#00ffff]/20"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
