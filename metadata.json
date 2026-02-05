@@ -1,0 +1,8 @@
+{
+  "name": "Topluyo",
+  "description": "Gelişmiş sesli ve yazılı topluluk platformu. Pembe kare gülen yüz logolu modern Discord alternatifi.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
