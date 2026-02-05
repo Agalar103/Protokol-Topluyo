@@ -10,6 +10,12 @@ interface ChannelListProps {
 
 const ChannelIcon: React.FC<{ type: ChannelType }> = ({ type }) => {
   switch(type) {
+    case ChannelType.NITRO:
+      return (
+        <svg className="w-4 h-4 text-[#ff00ff]" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z" />
+        </svg>
+      );
     case ChannelType.APP:
       return (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,48 +41,38 @@ const ChannelIcon: React.FC<{ type: ChannelType }> = ({ type }) => {
 
 const ChannelList: React.FC<ChannelListProps> = ({ channels, activeChannelId, onChannelSelect }) => {
   const categories = [
-    { name: 'UYGULAMA KANALLARI', type: ChannelType.APP },
-    { name: 'MARKET', type: ChannelType.MARKET },
-    { name: 'METİN KANALLARI', type: ChannelType.TEXT },
-    { name: 'SES KANALLARI', type: ChannelType.VOICE },
+    { name: 'MAĞAZA & PREMİUM', types: [ChannelType.MARKET, ChannelType.NITRO] },
+    { name: 'UYGULAMA KANALLARI', types: [ChannelType.APP] },
+    { name: 'METİN KANALLARI', types: [ChannelType.TEXT, ChannelType.ANNOUNCEMENT, ChannelType.FORUM] },
+    { name: 'SES KANALLARI', types: [ChannelType.VOICE, ChannelType.STAGE] },
   ];
 
   return (
     <div className="flex flex-col gap-6">
       {categories.map(cat => {
-        const filtered = channels.filter(c => c.type === cat.type || (cat.type === ChannelType.MARKET && c.type === ChannelType.MARKET));
+        const filtered = channels.filter(c => cat.types.includes(c.type));
         if (filtered.length === 0) return null;
 
         return (
           <div key={cat.name}>
             <div className="px-4 text-[10px] font-black text-white/20 uppercase mb-2 tracking-widest flex items-center justify-between group">
               <span>{cat.name}</span>
-              <button className="opacity-0 group-hover:opacity-100 hover:text-white transition-opacity">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
-              </button>
             </div>
             {filtered.map(c => (
               <div 
                 key={c.id}
                 onClick={() => onChannelSelect(c)}
-                className={`group px-3 py-1 mx-2 rounded flex items-center gap-2 cursor-pointer transition-all mb-0.5
+                className={`group px-3 py-1.5 mx-2 rounded flex items-center gap-2 cursor-pointer transition-all mb-0.5
                   ${activeChannelId === c.id 
                     ? 'bg-white/5 text-white' 
                     : 'text-white/30 hover:bg-white/[0.03] hover:text-white/60'}`}
               >
-                <div className={`transition-transform duration-200 ${activeChannelId === c.id ? 'scale-110 text-[#ff66b2]' : 'group-hover:scale-110'}`}>
+                <div className={`transition-transform duration-200 ${activeChannelId === c.id ? 'scale-110' : 'group-hover:scale-110'}`}>
                   <ChannelIcon type={c.type} />
                 </div>
                 <span className="text-xs font-bold truncate flex-1 tracking-tight">
                   {c.name}
                 </span>
-                {c.type === ChannelType.VOICE && activeChannelId === c.id && (
-                  <div className="flex gap-0.5">
-                    <div className="w-1 h-3 bg-green-500 animate-pulse" />
-                    <div className="w-1 h-2 bg-green-500 animate-pulse delay-75" />
-                    <div className="w-1 h-3 bg-green-500 animate-pulse delay-150" />
-                  </div>
-                )}
               </div>
             ))}
           </div>

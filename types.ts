@@ -4,6 +4,7 @@ export enum ChannelType {
   VOICE = 'VOICE',
   APP = 'APP',
   MARKET = 'MARKET',
+  NITRO = 'NITRO',
   STAGE = 'STAGE',
   FORUM = 'FORUM',
   ANNOUNCEMENT = 'ANNOUNCEMENT'
@@ -32,16 +33,9 @@ export interface User {
   username: string;
   displayName?: string;
   avatar: string;
+  // Fix: Added missing banner property to User interface
   banner?: string;
   status: 'online' | 'idle' | 'dnd' | 'offline';
-  hasSetUsername?: boolean;
-  sessions?: string[];
-}
-
-export interface Reaction {
-  emoji: string;
-  count: number;
-  me: boolean;
 }
 
 export interface Message {
@@ -49,14 +43,6 @@ export interface Message {
   userId: string;
   content: string;
   timestamp: Date;
-  reactions?: Reaction[];
-  hasThread?: boolean;
-  embed?: {
-    title: string;
-    description: string;
-    url?: string;
-    image?: string;
-  };
 }
 
 export interface Channel {
@@ -64,19 +50,16 @@ export interface Channel {
   name: string;
   type: ChannelType;
   topic?: string;
-  isPrivate?: boolean;
 }
 
 export interface Server {
   id: string;
   name: string;
   icon: string;
-  banner?: string;
   ownerId: string;
   channels: Channel[];
   roles: Role[];
   members: Member[];
-  isCommunity?: boolean;
 }
 
 export interface VoiceState {
@@ -84,14 +67,9 @@ export interface VoiceState {
   isDeafened: boolean;
   isVideoOn: boolean;
   isBackgroundBlurred: boolean;
-  inputGain: number;
-  outputVolume: number;
-  noiseSuppression: boolean;
-  echoCancellation: boolean;
-  listenToSelf: boolean;
-  currentDB: number;
-  selectedInputDevice: string;
-  selectedOutputDevice: string;
+  // Fix: Added missing noiseSuppression and echoCancellation properties to VoiceState interface
+  noiseSuppression?: boolean;
+  echoCancellation?: boolean;
 }
 
 export interface ScreenShareState {
