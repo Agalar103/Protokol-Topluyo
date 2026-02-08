@@ -69,7 +69,7 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
   ];
 
   return (
-    <div className="fixed inset-0 z-[500] flex bg-[#05010a] animate-in slide-in-from-right-full duration-500">
+    <div className="fixed inset-0 z-[500] flex bg-[#05010a] animate-in slide-in-from-right-full duration-500 overflow-hidden">
       {/* Sidebar Navigation - EXACT MATCH TO SCREENSHOT */}
       <div className="w-[280px] bg-[#110524] flex flex-col border-r border-white/5 shrink-0 overflow-y-auto no-scrollbar">
          <div className="p-4 pt-12 pb-2">
@@ -77,10 +77,10 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
                <input 
                  type="text" 
                  placeholder="Ara" 
-                 className="w-full bg-[#05010a] border border-black/20 rounded-md py-1 px-3 text-xs text-white/40 placeholder-white/20 outline-none focus:ring-1 focus:ring-blue-500/50"
+                 className="w-full bg-[#05010a] border border-black/20 rounded-md py-1.5 px-3 text-[13px] text-white/40 placeholder-white/20 outline-none focus:ring-1 focus:ring-blue-500/50"
                />
                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                </div>
             </div>
 

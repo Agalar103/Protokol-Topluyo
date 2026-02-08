@@ -15,18 +15,30 @@
       background-color: #0f051a;
       color: #e9d5ff;
     }
+    
+    /* Global Scrollbar Styles */
     ::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
+      height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #1e1135;
+      background: transparent;
     }
     ::-webkit-scrollbar-thumb {
       background: #4c1d95;
-      border-radius: 4px;
+      border-radius: 10px;
     }
     ::-webkit-scrollbar-thumb:hover {
       background: #6d28d9;
+    }
+
+    /* No-Scrollbar Utility */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none !important;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none !important;
+      scrollbar-width: none !important;
     }
 
     /* React Bits Inspired Animations */
