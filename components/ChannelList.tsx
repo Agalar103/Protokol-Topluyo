@@ -34,6 +34,12 @@ const ChannelIcon: React.FC<{ type: ChannelType }> = ({ type }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
       );
+    case ChannelType.WALLET:
+      return (
+        <svg className="w-4 h-4 text-[#00ffff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+      );
     case ChannelType.VOICE:
       return (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +53,7 @@ const ChannelIcon: React.FC<{ type: ChannelType }> = ({ type }) => {
 
 const ChannelList: React.FC<ChannelListProps> = ({ channels, activeChannelId, onChannelSelect }) => {
   const categories = [
-    { name: 'MAĞAZA & PREMİUM', types: [ChannelType.MARKET, ChannelType.NITRO, ChannelType.MATCH] },
+    { name: 'MAĞAZA & PREMİUM', types: [ChannelType.MARKET, ChannelType.NITRO, ChannelType.MATCH, ChannelType.WALLET] },
     { name: 'UYGULAMA KANALLARI', types: [ChannelType.APP] },
     { name: 'METİN KANALLARI', types: [ChannelType.TEXT, ChannelType.ANNOUNCEMENT, ChannelType.FORUM] },
     { name: 'SES KANALLARI', types: [ChannelType.VOICE, ChannelType.STAGE] },

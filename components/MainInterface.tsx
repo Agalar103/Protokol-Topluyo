@@ -11,6 +11,7 @@ import ServerSettingsModal from './ServerSettingsModal';
 import StoreArea from './StoreArea';
 import NitroArea from './NitroArea';
 import MatchArea from './MatchArea';
+import WalletArea from './WalletArea';
 import QuickChat from './QuickChat';
 import CreateServerModal from './CreateServerModal';
 import { User, Server, Channel, ChannelType, VoiceState, Role, Member, ScreenShareState } from '../types';
@@ -41,6 +42,7 @@ const INITIAL_SERVERS: Server[] = [
     channels: [
       { id: 'c1', name: 'manifesto', type: ChannelType.ANNOUNCEMENT },
       { id: 'c2', name: 'genel-sohbet', type: ChannelType.TEXT },
+      { id: 'w1', name: 'cüzdan', type: ChannelType.WALLET },
       { id: 'n1', name: 'topluyo-nitro', type: ChannelType.NITRO },
       { id: 'm1', name: 'nos-market', type: ChannelType.MARKET },
       { id: 'match1', name: 'eşleştiriyo', type: ChannelType.MATCH },
@@ -90,7 +92,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
   const handleChannelSelect = (channel: Channel) => setActiveChannel(channel);
   const handleServerSelect = (server: Server) => {
     setActiveServerId(server.id);
-    const firstSelectable = server.channels.find(c => [ChannelType.TEXT, ChannelType.ANNOUNCEMENT, ChannelType.MARKET].includes(c.type));
+    const firstSelectable = server.channels.find(c => [ChannelType.TEXT, ChannelType.ANNOUNCEMENT, ChannelType.MARKET, ChannelType.WALLET].includes(c.type));
     setActiveChannel(firstSelectable || server.channels[0]);
   };
 
@@ -113,6 +115,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
       channels: [
         { id: 'c1-' + Date.now(), name: 'manifesto', type: ChannelType.ANNOUNCEMENT },
         { id: 'c2-' + Date.now(), name: 'genel-sohbet', type: ChannelType.TEXT },
+        { id: 'w1-' + Date.now(), name: 'cüzdan', type: ChannelType.WALLET },
         { id: 'n1-' + Date.now(), name: 'topluyo-nitro', type: ChannelType.NITRO },
         { id: 'm1-' + Date.now(), name: 'nos-market', type: ChannelType.MARKET },
         { id: 'match1-' + Date.now(), name: 'eşleştiriyo', type: ChannelType.MATCH },
@@ -154,6 +157,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
         {activeChannel.type === ChannelType.MARKET ? <StoreArea /> : 
          activeChannel.type === ChannelType.NITRO ? <NitroArea /> :
          activeChannel.type === ChannelType.MATCH ? <MatchArea /> :
+         activeChannel.type === ChannelType.WALLET ? <WalletArea /> :
          activeChannel.type === ChannelType.VOICE || activeChannel.type === ChannelType.STAGE ? (
           <VoiceArea channel={activeChannel} members={activeServer.members} voiceState={voiceState} setVoiceState={setVoiceState} screenShare={screenShare} setScreenShare={setScreenShare} />
         ) : <ChatArea channelId={activeChannel.id} user={user} />}

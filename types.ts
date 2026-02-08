@@ -8,7 +8,8 @@ export enum ChannelType {
   STAGE = 'STAGE',
   FORUM = 'FORUM',
   ANNOUNCEMENT = 'ANNOUNCEMENT',
-  MATCH = 'MATCH'
+  MATCH = 'MATCH',
+  WALLET = 'WALLET'
 }
 
 export enum MessageType {
