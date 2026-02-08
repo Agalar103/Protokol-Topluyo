@@ -12,10 +12,10 @@ interface UserSettingsModalProps {
 }
 
 const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState, setVoiceState, onUpdateUser, onClose, onLogout }) => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'voice' | 'privacy'>('profile');
+  const [activeTab, setActiveTab] = useState<string>('hesabim');
   const [displayName, setDisplayName] = useState(user.displayName || user.username);
   
-  // Voice Settings Local State (Simulated for UI)
+  // Voice Settings Local State
   const [micVolume, setMicVolume] = useState(80);
   const [speakerVolume, setSpeakerVolume] = useState(50);
   const [inputProfile, setInputProfile] = useState<'isolation' | 'studio' | 'custom'>('custom');
@@ -41,32 +41,78 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
     reader.readAsDataURL(file);
   };
 
+  const menuItems = [
+    { section: 'Kullanıcı Ayarları', items: [
+      { id: 'hesabim', label: 'Hesabım', icon: '👤' },
+      { id: 'icerik', label: 'İçerik ve Sosyal', icon: '🛡️' },
+      { id: 'gizlilik', label: 'Veri ve Gizlilik', icon: '🛡️' },
+      { id: 'aile', label: 'Aile Merkezi', icon: '👥' },
+      { id: 'uygulamalar', label: 'Yetkili Uygulamalar', icon: '🧩' },
+      { id: 'cihazlar', label: 'Cihazlar', icon: '💻' },
+      { id: 'baglantilar', label: 'Bağlantılar', icon: '🔗' },
+      { id: 'bildirimler', label: 'Bildirimler', icon: '🔔' },
+      { id: 'warp', label: 'WARP+ (VPN)', icon: '🌐' },
+    ]},
+    { section: 'Faturalandırma Ayarları', items: [
+      { id: 'nitro', label: 'Nitro', icon: '🚀' },
+      { id: 'takviye', label: 'Sunucu Takviyesi', icon: '💎' },
+      { id: 'abonelikler', label: 'Abonelikler', icon: '🔄' },
+      { id: 'hediye', label: 'Hediye Envanteri', icon: '🎁' },
+      { id: 'faturalandirma', label: 'Faturalandırma', icon: '💳' },
+    ]},
+    { section: 'Uygulama Ayarları', items: [
+      { id: 'gorunum', label: 'Görünüm', icon: '🎨' },
+      { id: 'erisfilebilirlik', label: 'Erişilebilirlik', icon: '♿' },
+      { id: 'ses', label: 'Ses ve Görüntü', icon: '🎙️' },
+      { id: 'sohbet', label: 'Sohbet', icon: '💬' },
+    ]}
+  ];
+
   return (
     <div className="fixed inset-0 z-[500] flex bg-[#05010a] animate-in slide-in-from-right-full duration-500">
-      {/* Sidebar Navigation */}
-      <div className="w-80 bg-[#110524] flex flex-col items-end py-20 pr-10 border-r border-white/5 shrink-0">
-         <div className="w-60 space-y-2">
-            <p className="text-[11px] font-[1000] text-white/20 uppercase tracking-[0.4em] mb-6 italic">Sistem Konfigürasyonu</p>
-            <button 
-              onClick={() => setActiveTab('profile')}
-              className={`w-full text-left p-4 font-[1000] uppercase italic text-sm tracking-tighter transition-all border-l-4 ${activeTab === 'profile' ? 'bg-[#ff00ff]/10 text-[#ff00ff] border-[#ff00ff]' : 'text-white/30 border-transparent hover:bg-white/5 hover:text-white'}`}
-            >
-              Kimlik & Görünüm
-            </button>
-            <button 
-              onClick={() => setActiveTab('voice')}
-              className={`w-full text-left p-4 font-[1000] uppercase italic text-sm tracking-tighter transition-all border-l-4 ${activeTab === 'voice' ? 'bg-[#ff00ff]/10 text-[#ff00ff] border-[#ff00ff]' : 'text-white/30 border-transparent hover:bg-white/5 hover:text-white'}`}
-            >
-              Ses & Görüntü
-            </button>
-            <button 
-              onClick={() => setActiveTab('privacy')}
-              className={`w-full text-left p-4 font-[1000] uppercase italic text-sm tracking-tighter transition-all border-l-4 ${activeTab === 'privacy' ? 'bg-[#ff00ff]/10 text-[#ff00ff] border-[#ff00ff]' : 'text-white/30 border-transparent hover:bg-white/5 hover:text-white'}`}
-            >
-              Güvenlik & Gizlilik
-            </button>
-            <div className="h-px bg-white/5 my-10" />
-            <button onClick={onLogout} className="w-full text-left p-4 font-[1000] uppercase italic text-sm text-red-500 hover:bg-red-500/10 transition-all border-l-4 border-red-500/0 hover:border-red-500">Sistemden Çık</button>
+      {/* Sidebar Navigation - EXACT MATCH TO SCREENSHOT */}
+      <div className="w-[280px] bg-[#110524] flex flex-col border-r border-white/5 shrink-0 overflow-y-auto no-scrollbar">
+         <div className="p-4 pt-12 pb-2">
+            <div className="relative mb-6">
+               <input 
+                 type="text" 
+                 placeholder="Ara" 
+                 className="w-full bg-[#05010a] border border-black/20 rounded-md py-1 px-3 text-xs text-white/40 placeholder-white/20 outline-none focus:ring-1 focus:ring-blue-500/50"
+               />
+               <div className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+               </div>
+            </div>
+
+            <nav className="space-y-0.5">
+               {menuItems.map(section => (
+                 <div key={section.section} className="pb-4">
+                    <p className="px-3 text-[11px] font-bold text-white/30 uppercase tracking-wide mb-2 mt-4">{section.section}</p>
+                    {section.items.map(item => (
+                      <button 
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        className={`w-full text-left px-3 py-1.5 rounded-md flex items-center gap-3 transition-all duration-150 group
+                          ${activeTab === item.id 
+                            ? 'bg-white/10 text-white font-bold' 
+                            : 'text-white/40 hover:bg-white/5 hover:text-white/70'}`}
+                      >
+                         <span className={`text-base transition-transform group-hover:scale-110 ${activeTab === item.id ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'}`}>
+                            {item.icon}
+                         </span>
+                         <span className="text-[13px] tracking-tight">{item.label}</span>
+                      </button>
+                    ))}
+                 </div>
+               ))}
+               <div className="h-px bg-white/5 my-4 mx-3" />
+               <button 
+                 onClick={onLogout}
+                 className="w-full text-left px-3 py-2 text-red-500/60 hover:text-red-500 hover:bg-red-500/5 rounded-md flex items-center gap-3 transition-all text-[13px] font-bold"
+               >
+                  🚪 Sistemi Terk Et
+               </button>
+            </nav>
          </div>
       </div>
 
@@ -77,7 +123,7 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
         </button>
 
         <div className="max-w-4xl mx-auto pb-20">
-           {activeTab === 'profile' && (
+           {activeTab === 'hesabim' && (
              <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <h2 className="text-6xl font-[1000] text-white uppercase italic tracking-tighter leading-none mb-4">PROFİL_TERMİNALİ</h2>
                 <div className="bg-[#110524] border-4 border-white/5 relative overflow-hidden group shadow-2xl">
@@ -121,15 +167,13 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
              </div>
            )}
            
-           {/* VOICE SETTINGS - MATCHING THE PHOTO */}
-           {activeTab === 'voice' && (
+           {activeTab === 'ses' && (
              <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <header className="mb-8">
                   <h2 className="text-xl font-bold text-white tracking-tight uppercase">Ses ve Görüntü</h2>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                   {/* Input Device */}
                    <div className="space-y-3">
                       <label className="text-[11px] font-black text-white/50 uppercase tracking-widest">Mikrofon</label>
                       <div className="relative group">
@@ -142,8 +186,6 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
                         </div>
                       </div>
                    </div>
-
-                   {/* Output Device */}
                    <div className="space-y-3">
                       <label className="text-[11px] font-black text-white/50 uppercase tracking-widest">Konuşmacı</label>
                       <div className="relative group">
@@ -156,8 +198,6 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
                         </div>
                       </div>
                    </div>
-
-                   {/* Mic Volume */}
                    <div className="space-y-4">
                       <label className="text-[11px] font-black text-white/50 uppercase tracking-widest">Mikrofon Ses Seviyesi</label>
                       <div className="relative pt-2">
@@ -165,8 +205,6 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
                         <div className="absolute top-2 left-0 h-1.5 bg-blue-500 rounded-full pointer-events-none" style={{ width: `${micVolume}%` }} />
                       </div>
                    </div>
-
-                   {/* Output Volume */}
                    <div className="space-y-4">
                       <label className="text-[11px] font-black text-white/50 uppercase tracking-widest">Hoparlör Ses Seviyesi</label>
                       <div className="relative pt-2">
@@ -176,10 +214,8 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
                    </div>
                 </div>
 
-                {/* Mic Test Section */}
                 <div className="pt-8 border-t border-white/5">
                    <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wide">Mikrofon Testi</h3>
-                   <p className="text-xs text-white/40 mb-4 font-medium italic">Mikrofonunda sorun mu var? Bir test yap ve komik bir şey söyle, sonra sesini sana dinleteceğiz.</p>
                    <div className="flex items-center gap-6">
                       <button 
                         onClick={() => setIsTestingMic(!isTestingMic)}
@@ -193,10 +229,8 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
                          ))}
                       </div>
                    </div>
-                   <p className="mt-4 text-[10px] text-white/30 font-bold uppercase tracking-widest">Ses veya görüntüyle ilgili yardıma mı ihtiyacın var? <span className="text-blue-400 cursor-pointer hover:underline">Sorun giderme rehberimize</span> göz at.</p>
                 </div>
 
-                {/* Input Profiles */}
                 <div className="pt-8 border-t border-white/5 space-y-6">
                    <h3 className="text-sm font-bold text-white uppercase tracking-wide">Giriş Profili</h3>
                    <div className="space-y-4">
@@ -217,86 +251,14 @@ const UserSettingsModal: React.FC<UserSettingsModalProps> = ({ user, voiceState,
                       ))}
                    </div>
                 </div>
-
-                {/* Input Sensitivity */}
-                <div className="pt-8 border-t border-white/5 space-y-4">
-                   <div className="flex justify-between items-center">
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wide">Giriş Duyarlılığı</h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-white/20 uppercase tracking-widest italic">Otomatik</span>
-                        <div className="w-10 h-5 bg-white/5 rounded-full relative cursor-pointer border border-white/10">
-                           <div className="absolute left-1 top-1 w-3 h-3 bg-white/40 rounded-full" />
-                        </div>
-                      </div>
-                   </div>
-                   <p className="text-[11px] text-white/30 font-medium italic">Topluyo'nun mikrofonundan ne kadar ses ilettiğini ayarlar.</p>
-                   <div className="relative pt-6">
-                      <div className="h-2 w-full rounded-full bg-gradient-to-r from-yellow-500 via-yellow-400 to-green-500 opacity-80" />
-                      <input type="range" min="0" max="100" value={sensitivity} onChange={(e) => setSensitivity(parseInt(e.target.value))} className="absolute top-4 w-full h-6 bg-transparent appearance-none cursor-pointer accent-white z-10" />
-                      <div className="absolute top-5 bg-white w-1 h-4 shadow-[0_0_10px_white]" style={{ left: `${sensitivity}%` }} />
-                   </div>
-                </div>
-
-                {/* Noise Suppression (Krisp) */}
-                <div className="pt-8 border-t border-white/5 flex items-center justify-between">
-                   <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wide">Gürültü Azaltma</h3>
-                      <p className="text-[11px] text-white/30 font-medium italic">Mikrofonundaki arka plan seslerini azaltır. <span className="text-blue-400">Krisp</span> ile güçlendirildi.</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-xl font-black text-white italic tracking-tighter">krisp</span>
-                      </div>
-                   </div>
-                   <div className="relative w-48">
-                      <select className="w-full bg-[#110524] border border-black p-2.5 rounded text-xs text-white/80 font-bold appearance-none outline-none focus:ring-1 focus:ring-blue-500">
-                         <option>Krisp</option>
-                         <option>Standart</option>
-                         <option>Kapalı</option>
-                      </select>
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                      </div>
-                   </div>
-                </div>
-
-                {/* Echo Cancellation */}
-                <div className="pt-8 border-t border-white/5 flex items-center justify-between group">
-                   <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wide">Yankı Engelleme</h3>
-                      <p className="text-[11px] text-white/30 font-medium italic">Karşı tarafa giden yankıları minimize eder.</p>
-                   </div>
-                   <div 
-                    onClick={() => setVoiceState(v => ({...v, echoCancellation: !v.echoCancellation}))}
-                    className={`w-12 h-6 rounded-full relative transition-all cursor-pointer ${voiceState.echoCancellation ? 'bg-blue-600' : 'bg-white/10 border border-white/5'}`}
-                   >
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-md ${voiceState.echoCancellation ? 'left-7' : 'left-1 bg-white/40'}`} />
-                   </div>
-                </div>
-
-                {/* Push to Talk */}
-                <div className="pt-8 border-t border-white/5 flex items-center justify-between group">
-                   <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wide">Bas-Konuş (Sınırlı)</h3>
-                      <p className="text-[11px] text-white/30 font-medium italic">Sadece tuşa bastığında konuşmanı iletir.</p>
-                   </div>
-                   <div className={`w-12 h-6 rounded-full relative bg-white/10 border border-white/5 cursor-not-allowed`}>
-                      <div className="absolute top-1 left-1 w-4 h-4 bg-white/40 rounded-full" />
-                   </div>
-                </div>
              </div>
            )}
 
-           {activeTab === 'privacy' && (
-             <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <h2 className="text-6xl font-[1000] text-white uppercase italic tracking-tighter leading-none">GÜVENLİK_KATI</h2>
-                <div className="bg-[#110524] p-12 border-4 border-white/5 space-y-12">
-                   <div className="flex items-center justify-between p-8 bg-black/40 border-2 border-white/5 group hover:border-yellow-400 transition-all">
-                      <div>
-                         <h4 className="text-xl font-[1000] text-white uppercase italic tracking-tighter mb-2">2FA_ZORUNLULUĞU</h4>
-                         <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Oturum güvenliğini maksimum seviyeye çıkar.</p>
-                      </div>
-                      <button className="bg-yellow-400 text-black px-8 py-3 font-black uppercase italic tracking-widest text-[10px] border-4 border-white">AKTİF ET</button>
-                   </div>
-                </div>
+           {(activeTab !== 'hesabim' && activeTab !== 'ses') && (
+             <div className="flex flex-col items-center justify-center h-[60vh] opacity-20 text-center">
+                <div className="text-8xl mb-6">🚧</div>
+                <h2 className="text-4xl font-black uppercase italic tracking-tighter">TERMİNAL_YAPIM_AŞAMASINDA</h2>
+                <p className="mt-4 font-bold text-sm tracking-widest uppercase">BU SEKMEYE ERİŞİM GEÇİCİ OLARAK PROTOKOL DIŞIDIR</p>
              </div>
            )}
         </div>

@@ -17,6 +17,7 @@ interface MainInterfaceProps {
   onLogout: () => void;
   initialServerId?: string;
   onBackToServers: () => void;
+  onUpdateUser: (user: User) => void;
 }
 
 const INITIAL_ROLES: Role[] = [
@@ -43,16 +44,13 @@ const INITIAL_SERVERS: Server[] = [
   { id: 's2', name: 'Destek', icon: '🆘', ownerId: 'admin-1', roles: INITIAL_ROLES, members: [], channels: [{ id: 'tc2', name: 'destek-sohbet', type: ChannelType.TEXT }] },
 ];
 
-const MainInterface: React.FC<MainInterfaceProps> = ({ user: initialUser, onLogout, initialServerId, onBackToServers }) => {
-  const [user, setUser] = useState<User>(initialUser);
+const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialServerId, onBackToServers, onUpdateUser }) => {
   const [servers] = useState<Server[]>(INITIAL_SERVERS);
   const [activeServer, setActiveServer] = useState<Server>(servers.find(s => s.id === initialServerId) || servers[0]);
   const [activeChannel, setActiveChannel] = useState<Channel>(activeServer.channels[1] || activeServer.channels[0]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isServerSettingsOpen, setIsServerSettingsOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
   
-  // Fix: Explicitly initialized noiseSuppression and echoCancellation in voiceState to avoid undefined issues in settings modal
   const [voiceState, setVoiceState] = useState<VoiceState>({
     isMuted: false, 
     isDeafened: false, 
@@ -97,7 +95,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user: initialUser, onLogo
 
       <MemberSidebar activeServer={activeServer} />
 
-      {isSettingsOpen && <UserSettingsModal user={user} voiceState={voiceState} setVoiceState={setVoiceState} onUpdateUser={setUser} onClose={() => setIsSettingsOpen(false)} onLogout={onLogout} />}
+      {isSettingsOpen && <UserSettingsModal user={user} voiceState={voiceState} setVoiceState={setVoiceState} onUpdateUser={onUpdateUser} onClose={() => setIsSettingsOpen(false)} onLogout={onLogout} />}
       {isServerSettingsOpen && <ServerSettingsModal server={activeServer} onUpdateServer={() => {}} onClose={() => setIsServerSettingsOpen(false)} />}
     </div>
   );

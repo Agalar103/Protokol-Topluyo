@@ -25,6 +25,11 @@ const App: React.FC = () => {
     setView('server-selection');
   };
 
+  const handleUpdateUser = (updatedUser: User) => {
+    setCurrentUser(updatedUser);
+    localStorage.setItem('nebula_user', JSON.stringify(updatedUser));
+  };
+
   const handleServerSelect = (serverId: string) => {
     setSelectedServerId(serverId);
     setView('main');
@@ -49,6 +54,7 @@ const App: React.FC = () => {
           onLogout={handleLogout} 
           initialServerId={selectedServerId}
           onBackToServers={handleBackToServers}
+          onUpdateUser={handleUpdateUser}
         />
       </div>
     );
