@@ -12,6 +12,7 @@ import StoreArea from './StoreArea';
 import NitroArea from './NitroArea';
 import MatchArea from './MatchArea';
 import QuickChat from './QuickChat';
+import CreateServerModal from './CreateServerModal';
 import { User, Server, Channel, ChannelType, VoiceState, Role, Member, ScreenShareState } from '../types';
 
 interface MainInterfaceProps {
@@ -50,9 +51,10 @@ const INITIAL_SERVERS: Server[] = [
 ];
 
 const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialServerId, onBackToServers, onUpdateUser, onShowProfile }) => {
-  const [servers] = useState<Server[]>(INITIAL_SERVERS);
+  const [servers, setServers] = useState<Server[]>(INITIAL_SERVERS);
   const [activeServerId, setActiveServerId] = useState<string>(initialServerId || servers[0].id);
   const [activeDM, setActiveDM] = useState<Member | User | null>(null);
+  const [isCreateServerModalOpen, setIsCreateServerModalOpen] = useState(false);
   
   const activeServer = useMemo(() => {
     const s = servers.find(srv => srv.id === activeServerId) || servers[0];
@@ -64,7 +66,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
       username: user.username,
       avatar: user.avatar,
       status: 'online',
-      roleId: user.id === 'admin-1' ? 'r1' : 'r3',
+      roleId: user.id === s.ownerId ? 'r1' : 'r3',
       customStatus: 'Siber Ağda Aktif',
       bio: user.bio,
       banner: user.banner
@@ -88,7 +90,8 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
   const handleChannelSelect = (channel: Channel) => setActiveChannel(channel);
   const handleServerSelect = (server: Server) => {
     setActiveServerId(server.id);
-    setActiveChannel(server.channels[0]);
+    const firstSelectable = server.channels.find(c => [ChannelType.TEXT, ChannelType.ANNOUNCEMENT, ChannelType.MARKET].includes(c.type));
+    setActiveChannel(firstSelectable || server.channels[0]);
   };
 
   const handleMemberClick = (member: Member) => {
@@ -99,13 +102,46 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
     }
   };
 
+  const handleCreateServer = (data: any) => {
+    const newServer: Server = {
+      id: 's-' + Date.now(),
+      name: data.name,
+      icon: data.icon,
+      ownerId: user.id,
+      roles: INITIAL_ROLES,
+      members: [],
+      channels: [
+        { id: 'c1-' + Date.now(), name: 'manifesto', type: ChannelType.ANNOUNCEMENT },
+        { id: 'c2-' + Date.now(), name: 'genel-sohbet', type: ChannelType.TEXT },
+        { id: 'n1-' + Date.now(), name: 'topluyo-nitro', type: ChannelType.NITRO },
+        { id: 'm1-' + Date.now(), name: 'nos-market', type: ChannelType.MARKET },
+        { id: 'match1-' + Date.now(), name: 'eşleştiriyo', type: ChannelType.MATCH },
+        { id: 'v1-' + Date.now(), name: 'ana-terminal', type: ChannelType.VOICE },
+      ]
+    };
+    
+    setServers(prev => [...prev, newServer]);
+    setActiveServerId(newServer.id);
+    setActiveChannel(newServer.channels[1]);
+    setIsCreateServerModalOpen(false);
+  };
+
   return (
     <div className="flex h-screen w-full bg-[#0b0314] text-[#e9d5ff] animate-in fade-in duration-500 overflow-hidden relative">
-      <Sidebar servers={servers} activeServerId={activeServer.id} onServerSelect={handleServerSelect} onAddServer={() => {}} onBackToHub={onBackToServers} />
+      <Sidebar 
+        servers={servers} 
+        activeServerId={activeServer.id} 
+        onServerSelect={handleServerSelect} 
+        onAddServer={() => setIsCreateServerModalOpen(true)} 
+        onBackToHub={onBackToServers} 
+      />
 
       <div className="w-64 bg-[#110524] flex flex-col border-r border-white/5 shrink-0">
         <button onClick={() => setIsServerSettingsOpen(true)} className="h-12 px-4 flex items-center justify-between hover:bg-white/5 transition-all font-black text-xs uppercase tracking-widest text-white/80 italic">
-          {activeServer.name}
+          <div className="flex items-center gap-2 truncate">
+             {activeServer.ownerId === user.id && <span className="text-[#ff00ff]">👑</span>}
+             <span className="truncate">{activeServer.name}</span>
+          </div>
           <svg className="w-4 h-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
         </button>
         <div className="flex-1 overflow-y-auto no-scrollbar py-2">
@@ -135,6 +171,13 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
 
       {isSettingsOpen && <UserSettingsModal user={user} voiceState={voiceState} setVoiceState={setVoiceState} onUpdateUser={onUpdateUser} onClose={() => setIsSettingsOpen(false)} onLogout={onLogout} />}
       {isServerSettingsOpen && <ServerSettingsModal server={activeServer} onUpdateServer={() => {}} onClose={() => setIsServerSettingsOpen(false)} />}
+      
+      {isCreateServerModalOpen && (
+        <CreateServerModal 
+          onClose={() => setIsCreateServerModalOpen(false)} 
+          onCreate={handleCreateServer} 
+        />
+      )}
     </div>
   );
 };

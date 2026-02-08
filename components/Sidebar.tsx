@@ -51,6 +51,14 @@ const Sidebar: React.FC<SidebarProps> = ({ servers, activeServerId, onServerSele
     onServerSelect(server);
   };
 
+  const renderIcon = (icon: string) => {
+    const isImage = icon.startsWith('http') || icon.startsWith('data:image');
+    if (isImage) {
+      return <img src={icon} className="w-full h-full object-cover group-hover:scale-110 transition-transform" alt="Server Icon" />;
+    }
+    return <span className="text-white font-black text-sm uppercase italic group-hover:scale-110 transition-transform">{icon}</span>;
+  };
+
   return (
     <div className="w-[72px] bg-[#0f051a] flex flex-col items-center py-3 gap-2 overflow-y-auto overflow-x-hidden no-scrollbar shrink-0 h-full border-r border-white/5 select-none">
       {/* Home / Hub Button */}
@@ -76,12 +84,12 @@ const Sidebar: React.FC<SidebarProps> = ({ servers, activeServerId, onServerSele
           <div 
             key={server.id} 
             onClick={() => handleServerClick(server)}
-            className={`group relative flex items-center justify-center w-12 h-12 transition-all duration-300 cursor-pointer shrink-0 magnetic-btn
+            className={`group relative flex items-center justify-center w-12 h-12 transition-all duration-300 cursor-pointer shrink-0 magnetic-btn overflow-hidden
               ${activeServerId === server.id 
                 ? 'bg-[#ff00ff] rounded-lg shadow-[0_0_15px_rgba(255,0,255,0.4)]' 
                 : 'bg-[#1e1135] rounded-xl hover:rounded-lg hover:bg-[#ff00ff]/80 shadow-md'}`}
           >
-            <span className="text-white font-black text-sm uppercase italic group-hover:scale-110 transition-transform">{server.icon}</span>
+            {renderIcon(server.icon)}
             <div className={`absolute left-[-4px] w-2 bg-white rounded-r-full transition-all duration-500 
               ${activeServerId === server.id ? 'h-10 scale-100' : 'h-2 scale-0 group-hover:scale-100'}`} 
             />
