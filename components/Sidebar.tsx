@@ -11,17 +11,27 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ servers, activeServerId, onServerSelect, onAddServer, onBackToHub }) => {
-  const playSound = (type: 'click' | 'blip') => {
+  const playSound = (type: 'click' | 'blip' | 'switch') => {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(type === 'click' ? 300 : 800, audioCtx.currentTime);
-      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      
+      if (type === 'switch') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.08);
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      } else {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(type === 'click' ? 1200 : 2400, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      }
+      
       oscillator.start();
       oscillator.stop(audioCtx.currentTime + 0.1);
     } catch(e) {}
@@ -33,7 +43,11 @@ const Sidebar: React.FC<SidebarProps> = ({ servers, activeServerId, onServerSele
   };
 
   const handleServerClick = (server: Server) => {
-    playSound('click');
+    if (server.id !== activeServerId) {
+      playSound('switch');
+    } else {
+      playSound('click');
+    }
     onServerSelect(server);
   };
 

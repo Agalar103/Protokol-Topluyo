@@ -7,7 +7,8 @@ export enum ChannelType {
   NITRO = 'NITRO',
   STAGE = 'STAGE',
   FORUM = 'FORUM',
-  ANNOUNCEMENT = 'ANNOUNCEMENT'
+  ANNOUNCEMENT = 'ANNOUNCEMENT',
+  MATCH = 'MATCH'
 }
 
 export enum MessageType {

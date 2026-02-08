@@ -10,6 +10,8 @@ import MemberSidebar from './MemberSidebar';
 import ServerSettingsModal from './ServerSettingsModal';
 import StoreArea from './StoreArea';
 import NitroArea from './NitroArea';
+import MatchArea from './MatchArea';
+import QuickChat from './QuickChat';
 import { User, Server, Channel, ChannelType, VoiceState, Role, Member, ScreenShareState } from '../types';
 
 interface MainInterfaceProps {
@@ -33,13 +35,15 @@ const INITIAL_SERVERS: Server[] = [
     members: [
       { id: 'admin-1', username: 'AgalarHero', avatar: 'https://picsum.photos/seed/admin/200/200', status: 'online', roleId: 'r1' },
       { id: 'u2', username: 'Bot_Cyber', avatar: 'https://picsum.photos/seed/bot/200/200', status: 'online', roleId: 'r2' },
+      { id: 'bot-test', username: 'Topluyo_Bot', avatar: 'https://picsum.photos/seed/topluyobot/200/200', status: 'online', roleId: 'r3', customStatus: '7/24 Aktif Yardımcı' },
     ],
     channels: [
       { id: 'c1', name: 'manifesto', type: ChannelType.ANNOUNCEMENT },
       { id: 'c2', name: 'genel-sohbet', type: ChannelType.TEXT },
       { id: 'n1', name: 'topluyo-nitro', type: ChannelType.NITRO },
-      { id: 'v1', name: 'ana-terminal', type: ChannelType.VOICE },
       { id: 'm1', name: 'nos-market', type: ChannelType.MARKET },
+      { id: 'match1', name: 'eşleştiriyo', type: ChannelType.MATCH },
+      { id: 'v1', name: 'ana-terminal', type: ChannelType.VOICE },
     ]
   },
   { id: 's2', name: 'Destek', icon: '🆘', ownerId: 'admin-1', roles: INITIAL_ROLES, members: [], channels: [{ id: 'tc2', name: 'destek-sohbet', type: ChannelType.TEXT }] },
@@ -48,6 +52,7 @@ const INITIAL_SERVERS: Server[] = [
 const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialServerId, onBackToServers, onUpdateUser, onShowProfile }) => {
   const [servers] = useState<Server[]>(INITIAL_SERVERS);
   const [activeServerId, setActiveServerId] = useState<string>(initialServerId || servers[0].id);
+  const [activeDM, setActiveDM] = useState<Member | User | null>(null);
   
   const activeServer = useMemo(() => {
     const s = servers.find(srv => srv.id === activeServerId) || servers[0];
@@ -86,6 +91,14 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
     setActiveChannel(server.channels[0]);
   };
 
+  const handleMemberClick = (member: Member) => {
+    if (member.id !== user.id) {
+      setActiveDM(member);
+    } else {
+      onShowProfile(member);
+    }
+  };
+
   return (
     <div className="flex h-screen w-full bg-[#0b0314] text-[#e9d5ff] animate-in fade-in duration-500 overflow-hidden relative">
       <Sidebar servers={servers} activeServerId={activeServer.id} onServerSelect={handleServerSelect} onAddServer={() => {}} onBackToHub={onBackToServers} />
@@ -104,12 +117,21 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
       <main className="flex-1 flex flex-col min-w-0 bg-[#0b0314] relative">
         {activeChannel.type === ChannelType.MARKET ? <StoreArea /> : 
          activeChannel.type === ChannelType.NITRO ? <NitroArea /> :
+         activeChannel.type === ChannelType.MATCH ? <MatchArea /> :
          activeChannel.type === ChannelType.VOICE || activeChannel.type === ChannelType.STAGE ? (
           <VoiceArea channel={activeChannel} members={activeServer.members} voiceState={voiceState} setVoiceState={setVoiceState} screenShare={screenShare} setScreenShare={setScreenShare} />
         ) : <ChatArea channelId={activeChannel.id} user={user} />}
       </main>
 
-      <MemberSidebar activeServer={activeServer} onMemberClick={onShowProfile} />
+      <MemberSidebar activeServer={activeServer} onMemberClick={handleMemberClick} />
+
+      {activeDM && (
+        <QuickChat 
+          currentUser={user} 
+          recipient={activeDM} 
+          onClose={() => setActiveDM(null)} 
+        />
+      )}
 
       {isSettingsOpen && <UserSettingsModal user={user} voiceState={voiceState} setVoiceState={setVoiceState} onUpdateUser={onUpdateUser} onClose={() => setIsSettingsOpen(false)} onLogout={onLogout} />}
       {isServerSettingsOpen && <ServerSettingsModal server={activeServer} onUpdateServer={() => {}} onClose={() => setIsServerSettingsOpen(false)} />}

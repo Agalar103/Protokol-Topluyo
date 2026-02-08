@@ -74,7 +74,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user }) => {
   const handleSendMessage = async (val: string, type: MessageType = MessageType.TEXT, mediaUrl?: string) => {
     if (!val.trim() && !mediaUrl) return;
     
-    playSound('pop');
+    playCyberSound('send');
     const userMessage: Message = { 
       id: Date.now().toString(), 
       userId: user.id, 
@@ -87,6 +87,20 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user }) => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue(''); // Inputu sıfırla
 
+    // 5651 COMMAND
+    if (val.trim() === '/5651') {
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: 'bot-5651-' + Date.now(),
+          userId: 'bot-system',
+          content: '(akp ve chp arasında fark kalmadı tüm tanrılar yardımcımız olsun)',
+          type: MessageType.TEXT,
+          timestamp: new Date()
+        }]);
+        playCyberSound('pop');
+      }, 500);
+    }
+
     if (val.startsWith('!oynat')) {
       setTimeout(() => {
         setMessages(prev => [...prev, {
@@ -97,6 +111,42 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user }) => {
           timestamp: new Date()
         }]);
       }, 800);
+    }
+
+    // SALE BOT INTEGRATION
+    if (val.toLowerCase().trim() === '/sale') {
+      setIsTyping(true);
+      try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+          model: 'gemini-3-flash-preview',
+          contents: "SteamDB verilerine dayanarak popüler indirimli oyunları bul. SADECE şu formatta bir liste döndür: Oyun İsmi - Fiyat - İndirim Oranı. Başka hiçbir metin, açıklama veya kaynak ekleme. Çok sade olsun.",
+          config: {
+            tools: [{ googleSearch: {} }],
+          },
+        });
+
+        const salesContent = response.text || 'İndirim verisi bulunamadı.';
+
+        setMessages(prev => [...prev, {
+          id: 'bot-sale-' + Date.now(),
+          userId: 'bot-sale',
+          content: salesContent,
+          type: MessageType.TEXT,
+          timestamp: new Date()
+        }]);
+      } catch (err) {
+        console.error(err);
+        setMessages(prev => [...prev, {
+          id: 'bot-sale-error-' + Date.now(),
+          userId: 'bot-sale',
+          content: '❌ Veri çekme hatası: SteamDB bağlantısı kurulamadı.',
+          type: MessageType.TEXT,
+          timestamp: new Date()
+        }]);
+      } finally {
+        setIsTyping(false);
+      }
     }
 
     if (val.toLowerCase().startsWith('/topluyo')) {
@@ -133,16 +183,31 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user }) => {
     e.target.value = '';
   };
 
-  const playSound = (type: 'pop') => {
+  const playCyberSound = (type: 'pop' | 'send' | 'click') => {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
-      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      
+      if (type === 'send') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.08);
+        gainNode.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      } else if (type === 'click') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(2400, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      } else {
+        oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      }
+      
       oscillator.start();
       oscillator.stop(audioCtx.currentTime + 0.1);
     } catch (e) { }
@@ -168,16 +233,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user }) => {
            const isMe = m.userId === user.id;
            const isAI = m.userId === 'topluyo-ai';
            const isBot = m.userId.startsWith('bot-');
+           const isSaleBot = m.userId === 'bot-sale';
            
            return (
              <div key={m.id} className="group flex gap-4 reveal-item" style={{ animationDelay: `${idx * 0.02}s` }}>
-               <div className={`w-10 h-10 rounded-lg shrink-0 flex items-center justify-center border border-white/10 shadow-lg ${isAI ? 'bg-[#ff00ff]' : (isBot || isMe) ? 'bg-[#1e1135] overflow-hidden' : 'bg-purple-900'}`}>
-                  {isAI ? '🤖' : (isBot || isMe) ? <img src={isMe ? user.avatar : `https://picsum.photos/seed/${m.userId}/40/40`} className="w-full h-full object-cover" alt="" /> : <div className="text-xl">👤</div>}
+               <div className={`w-10 h-10 rounded-lg shrink-0 flex items-center justify-center border border-white/10 shadow-lg ${isAI || isSaleBot ? 'bg-[#ff00ff]' : (isBot || isMe) ? 'bg-[#1e1135] overflow-hidden' : 'bg-purple-900'}`}>
+                  {isAI ? '🤖' : isSaleBot ? '🏷️' : (isBot || isMe) ? <img src={isMe ? user.avatar : `https://picsum.photos/seed/${m.userId}/40/40`} className="w-full h-full object-cover" alt="" /> : <div className="text-xl">👤</div>}
                </div>
                <div className="flex-1 min-w-0">
                  <div className="flex items-center gap-2 mb-1">
-                   <span className={`text-xs font-black uppercase italic tracking-tight ${isAI ? 'text-[#ff00ff]' : isBot ? 'text-[#00ffff]' : 'text-purple-300'}`}>
-                     {isAI ? 'TOPLUYO AI' : isBot ? 'SİSTEM_BOT' : user.username}
+                   <span className={`text-xs font-black uppercase italic tracking-tight ${isAI || isSaleBot ? 'text-[#ff00ff]' : isBot ? 'text-[#00ffff]' : 'text-purple-300'}`}>
+                     {isAI ? 'TOPLUYO AI' : isSaleBot ? 'SALE_BOT' : isBot ? 'SİSTEM_BOT' : user.username}
                    </span>
                    <span className="text-[9px] text-white/20 font-black">{m.timestamp.toLocaleTimeString()}</span>
                  </div>
@@ -195,7 +261,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user }) => {
              </div>
            );
          })}
-         {isTyping && <div className="text-[10px] font-black text-[#ff00ff] animate-pulse ml-14 uppercase tracking-widest italic">TOPLUYO_AI VERİ İŞLİYOR...</div>}
+         {isTyping && <div className="text-[10px] font-black text-[#ff00ff] animate-pulse ml-14 uppercase tracking-widest italic">AĞDAN VERİ ÇEKİLİYOR...</div>}
       </div>
 
       <div className="p-6 shrink-0">
@@ -209,7 +275,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user }) => {
             />
             
             <button 
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => { playCyberSound('click'); fileInputRef.current?.click(); }}
               className="p-4 text-white/20 hover:text-[#00ffff] transition-colors"
               title="Yükle"
             >
@@ -218,7 +284,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user }) => {
 
             <input 
               className="flex-1 bg-transparent py-5 px-2 text-white font-black placeholder-white/5 outline-none uppercase tracking-wider"
-              placeholder="MESAJ GÖNDER..."
+              placeholder="MESAJ GÖNDER // /sale // /topluyo // /5651"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => {
