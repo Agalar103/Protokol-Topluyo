@@ -4,12 +4,14 @@ import LandingPage from './components/LandingPage';
 import MainInterface from './components/MainInterface';
 import LoginPage from './components/LoginPage';
 import ServerSelection from './components/ServerSelection';
-import { User, Server } from './types';
+import ProfileView from './components/ProfileView';
+import { User, Server, Member } from './types';
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'landing' | 'login' | 'server-selection' | 'main'>('landing');
+  const [view, setView] = useState<'landing' | 'login' | 'server-selection' | 'main' | 'profile'>('landing');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedServerId, setSelectedServerId] = useState<string | null>(null);
+  const [viewedUser, setViewedUser] = useState<User | Member | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('nebula_user');
@@ -46,6 +48,15 @@ const App: React.FC = () => {
     setView('server-selection');
   };
 
+  const handleShowProfile = (user: User | Member) => {
+    setViewedUser(user);
+    setView('profile');
+  };
+
+  if (view === 'profile' && viewedUser) {
+    return <ProfileView user={viewedUser} onBack={() => setView('main')} />;
+  }
+
   if (view === 'main' && currentUser && selectedServerId) {
     return (
       <div className="h-screen w-full bg-[#0f051a] overflow-hidden">
@@ -55,6 +66,7 @@ const App: React.FC = () => {
           initialServerId={selectedServerId}
           onBackToServers={handleBackToServers}
           onUpdateUser={handleUpdateUser}
+          onShowProfile={handleShowProfile}
         />
       </div>
     );

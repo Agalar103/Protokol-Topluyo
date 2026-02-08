@@ -25,7 +25,14 @@ export interface Member {
   status: 'online' | 'idle' | 'dnd' | 'offline';
   roleId: string;
   customStatus?: string;
-  isSpeaker?: boolean; // For Stage
+  isSpeaker?: boolean;
+  bio?: string;
+  banner?: string;
+  stats?: {
+    posts: number;
+    followers: number;
+    following: number;
+  };
 }
 
 export interface User {
@@ -33,9 +40,14 @@ export interface User {
   username: string;
   displayName?: string;
   avatar: string;
-  // Fix: Added missing banner property to User interface
   banner?: string;
   status: 'online' | 'idle' | 'dnd' | 'offline';
+  bio?: string;
+  stats?: {
+    posts: number;
+    followers: number;
+    following: number;
+  };
 }
 
 export interface Message {
@@ -67,7 +79,6 @@ export interface VoiceState {
   isDeafened: boolean;
   isVideoOn: boolean;
   isBackgroundBlurred: boolean;
-  // Fix: Added missing noiseSuppression and echoCancellation properties to VoiceState interface
   noiseSuppression?: boolean;
   echoCancellation?: boolean;
 }

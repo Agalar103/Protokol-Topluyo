@@ -4,9 +4,10 @@ import { Server, Role, Member } from '../types';
 
 interface MemberSidebarProps {
   activeServer: Server;
+  onMemberClick: (member: Member) => void;
 }
 
-const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer }) => {
+const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer, onMemberClick }) => {
   return (
     <div className="hidden xl:flex w-60 bg-[#110524] flex-col border-l border-white/5 shrink-0 overflow-y-auto no-scrollbar">
       <div className="p-4 space-y-8">
@@ -23,7 +24,11 @@ const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer }) => {
               </div>
               <div className="space-y-1">
                 {members.map(member => (
-                  <div key={member.id} className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-white/5 cursor-pointer group transition-all">
+                  <div 
+                    key={member.id} 
+                    onClick={() => onMemberClick(member)}
+                    className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-white/5 cursor-pointer group transition-all"
+                  >
                     <div className="relative shrink-0">
                       <img src={member.avatar} className="w-8 h-8 rounded-xl bg-purple-900 shadow-md" alt={member.username} />
                       <div className={`absolute bottom-[-1px] right-[-1px] w-2.5 h-2.5 rounded-full border-2 border-[#110524] ${member.status === 'online' ? 'bg-green-500' : 'bg-gray-500'}`} />

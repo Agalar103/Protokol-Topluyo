@@ -7,9 +7,10 @@ interface UserPanelProps {
   voiceState: VoiceState;
   setVoiceState: React.Dispatch<React.SetStateAction<VoiceState>>;
   onOpenSettings: () => void;
+  onProfileClick: () => void;
 }
 
-const UserPanel: React.FC<UserPanelProps> = ({ user, voiceState, setVoiceState, onOpenSettings }) => {
+const UserPanel: React.FC<UserPanelProps> = ({ user, voiceState, setVoiceState, onOpenSettings, onProfileClick }) => {
   const playSound = (type: 'toggle' | 'click') => {
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -29,15 +30,15 @@ const UserPanel: React.FC<UserPanelProps> = ({ user, voiceState, setVoiceState, 
   return (
     <div className="bg-[#160a29] p-2 flex items-center justify-between shrink-0 shadow-lg border-t border-black/10">
       <div 
-        onClick={() => { playSound('click'); onOpenSettings(); }}
-        className="flex items-center gap-2 flex-1 min-w-0 px-2 py-1 rounded-xl hover:bg-white/5 cursor-pointer transition-all"
+        onClick={() => { playSound('click'); onProfileClick(); }}
+        className="flex items-center gap-2 flex-1 min-w-0 px-2 py-1 rounded-xl hover:bg-white/5 cursor-pointer transition-all group"
       >
         <div className="relative shrink-0">
-          <img src={user.avatar} className="w-8 h-8 rounded-xl shadow-md transition-all" alt="Avatar" />
+          <img src={user.avatar} className="w-8 h-8 rounded-xl shadow-md transition-all group-hover:scale-110" alt="Avatar" />
           <div className="absolute bottom-[-1px] right-[-1px] w-3 h-3 bg-green-500 border-2 border-[#160a29] rounded-full" />
         </div>
         <div className="flex flex-col min-w-0">
-          <span className="text-white text-sm font-black tracking-tight truncate">{user.username}</span>
+          <span className="text-white text-sm font-black tracking-tight truncate group-hover:text-[#ff00ff] transition-colors">{user.username}</span>
           <span className="text-purple-300/20 text-[10px] font-bold truncate">#0001</span>
         </div>
       </div>

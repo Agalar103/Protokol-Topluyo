@@ -18,6 +18,7 @@ interface MainInterfaceProps {
   initialServerId?: string;
   onBackToServers: () => void;
   onUpdateUser: (user: User) => void;
+  onShowProfile: (user: User | Member) => void;
 }
 
 const INITIAL_ROLES: Role[] = [
@@ -44,7 +45,7 @@ const INITIAL_SERVERS: Server[] = [
   { id: 's2', name: 'Destek', icon: '🆘', ownerId: 'admin-1', roles: INITIAL_ROLES, members: [], channels: [{ id: 'tc2', name: 'destek-sohbet', type: ChannelType.TEXT }] },
 ];
 
-const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialServerId, onBackToServers, onUpdateUser }) => {
+const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialServerId, onBackToServers, onUpdateUser, onShowProfile }) => {
   const [servers] = useState<Server[]>(INITIAL_SERVERS);
   const [activeServer, setActiveServer] = useState<Server>(servers.find(s => s.id === initialServerId) || servers[0]);
   const [activeChannel, setActiveChannel] = useState<Channel>(activeServer.channels[1] || activeServer.channels[0]);
@@ -82,7 +83,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
         <div className="flex-1 overflow-y-auto no-scrollbar py-2">
           <ChannelList channels={activeServer.channels} activeChannelId={activeChannel.id} onChannelSelect={handleChannelSelect} />
         </div>
-        <UserPanel user={user} voiceState={voiceState} setVoiceState={setVoiceState} onOpenSettings={() => setIsSettingsOpen(true)} />
+        <UserPanel user={user} voiceState={voiceState} setVoiceState={setVoiceState} onOpenSettings={() => setIsSettingsOpen(true)} onProfileClick={() => onShowProfile(user)} />
       </div>
 
       <main className="flex-1 flex flex-col min-w-0 bg-[#0b0314] relative">
@@ -93,7 +94,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
         ) : <ChatArea channelId={activeChannel.id} />}
       </main>
 
-      <MemberSidebar activeServer={activeServer} />
+      <MemberSidebar activeServer={activeServer} onMemberClick={onShowProfile} />
 
       {isSettingsOpen && <UserSettingsModal user={user} voiceState={voiceState} setVoiceState={setVoiceState} onUpdateUser={onUpdateUser} onClose={() => setIsSettingsOpen(false)} onLogout={onLogout} />}
       {isServerSettingsOpen && <ServerSettingsModal server={activeServer} onUpdateServer={() => {}} onClose={() => setIsServerSettingsOpen(false)} />}
