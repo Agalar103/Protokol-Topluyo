@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import Sidebar from './Sidebar';
 import ChannelList from './ChannelList';
 import ChatArea from './ChatArea';
@@ -47,18 +47,33 @@ const INITIAL_SERVERS: Server[] = [
 
 const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialServerId, onBackToServers, onUpdateUser, onShowProfile }) => {
   const [servers] = useState<Server[]>(INITIAL_SERVERS);
-  const [activeServer, setActiveServer] = useState<Server>(servers.find(s => s.id === initialServerId) || servers[0]);
+  const [activeServerId, setActiveServerId] = useState<string>(initialServerId || servers[0].id);
+  
+  const activeServer = useMemo(() => {
+    const s = servers.find(srv => srv.id === activeServerId) || servers[0];
+    
+    // Aktif kullanıcının üye listesinde olduğundan emin ol
+    const otherMembers = s.members.filter(m => m.id !== user.id);
+    const currentUserAsMember: Member = {
+      id: user.id,
+      username: user.username,
+      avatar: user.avatar,
+      status: 'online',
+      roleId: user.id === 'admin-1' ? 'r1' : 'r3',
+      customStatus: 'Siber Ağda Aktif',
+      bio: user.bio,
+      banner: user.banner
+    };
+
+    return { ...s, members: [...otherMembers, currentUserAsMember] };
+  }, [servers, activeServerId, user]);
+
   const [activeChannel, setActiveChannel] = useState<Channel>(activeServer.channels[1] || activeServer.channels[0]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isServerSettingsOpen, setIsServerSettingsOpen] = useState(false);
   
   const [voiceState, setVoiceState] = useState<VoiceState>({
-    isMuted: false, 
-    isDeafened: false, 
-    isVideoOn: false, 
-    isBackgroundBlurred: true,
-    noiseSuppression: true,
-    echoCancellation: true,
+    isMuted: false, isDeafened: false, isVideoOn: false, isBackgroundBlurred: true
   });
 
   const [screenShare, setScreenShare] = useState<ScreenShareState>({
@@ -67,7 +82,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
 
   const handleChannelSelect = (channel: Channel) => setActiveChannel(channel);
   const handleServerSelect = (server: Server) => {
-    setActiveServer(server);
+    setActiveServerId(server.id);
     setActiveChannel(server.channels[0]);
   };
 
@@ -91,7 +106,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
          activeChannel.type === ChannelType.NITRO ? <NitroArea /> :
          activeChannel.type === ChannelType.VOICE || activeChannel.type === ChannelType.STAGE ? (
           <VoiceArea channel={activeChannel} members={activeServer.members} voiceState={voiceState} setVoiceState={setVoiceState} screenShare={screenShare} setScreenShare={setScreenShare} />
-        ) : <ChatArea channelId={activeChannel.id} />}
+        ) : <ChatArea channelId={activeChannel.id} user={user} />}
       </main>
 
       <MemberSidebar activeServer={activeServer} onMemberClick={onShowProfile} />

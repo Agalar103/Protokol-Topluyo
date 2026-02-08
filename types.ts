@@ -10,6 +10,13 @@ export enum ChannelType {
   ANNOUNCEMENT = 'ANNOUNCEMENT'
 }
 
+export enum MessageType {
+  TEXT = 'TEXT',
+  IMAGE = 'IMAGE',
+  VIDEO = 'VIDEO',
+  GIF = 'GIF'
+}
+
 export interface Role {
   id: string;
   name: string;
@@ -53,7 +60,9 @@ export interface User {
 export interface Message {
   id: string;
   userId: string;
-  content: string;
+  content?: string;
+  mediaUrl?: string;
+  type: MessageType;
   timestamp: Date;
 }
 
