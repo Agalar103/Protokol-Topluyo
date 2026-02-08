@@ -5,6 +5,7 @@ import MainInterface from './components/MainInterface';
 import LoginPage from './components/LoginPage';
 import ServerSelection from './components/ServerSelection';
 import ProfileView from './components/ProfileView';
+import SecurityMiddleware from './components/SecurityMiddleware';
 import { User, Server, Member } from './types';
 
 const App: React.FC = () => {
@@ -53,46 +54,36 @@ const App: React.FC = () => {
     setView('profile');
   };
 
-  if (view === 'profile' && viewedUser) {
-    return <ProfileView user={viewedUser} onBack={() => setView('main')} />;
-  }
-
-  if (view === 'main' && currentUser && selectedServerId) {
-    return (
-      <div className="h-screen w-full bg-[#0f051a] overflow-hidden">
-        <MainInterface 
-          user={currentUser} 
-          onLogout={handleLogout} 
-          initialServerId={selectedServerId}
-          onBackToServers={handleBackToServers}
-          onUpdateUser={handleUpdateUser}
-          onShowProfile={handleShowProfile}
-        />
-      </div>
-    );
-  }
-
-  if (view === 'server-selection' && currentUser) {
-    return (
-      <ServerSelection 
-        user={currentUser} 
-        onSelectServer={handleServerSelect} 
-        onLogout={handleLogout}
-      />
-    );
-  }
-
   return (
-    <div className="h-screen w-full bg-[#0f051a] overflow-hidden">
-      {view === 'landing' ? (
-        <LandingPage onLogin={() => setView('login')} />
-      ) : (
-        <LoginPage 
-          onSuccess={handleLoginSuccess} 
-          onBack={() => setView('landing')} 
-        />
-      )}
-    </div>
+    <SecurityMiddleware>
+      <div className="h-screen w-full bg-[#0f051a] overflow-hidden">
+        {view === 'profile' && viewedUser ? (
+          <ProfileView user={viewedUser} onBack={() => setView('main')} />
+        ) : view === 'main' && currentUser && selectedServerId ? (
+          <MainInterface 
+            user={currentUser} 
+            onLogout={handleLogout} 
+            initialServerId={selectedServerId}
+            onBackToServers={handleBackToServers}
+            onUpdateUser={handleUpdateUser}
+            onShowProfile={handleShowProfile}
+          />
+        ) : view === 'server-selection' && currentUser ? (
+          <ServerSelection 
+            user={currentUser} 
+            onSelectServer={handleServerSelect} 
+            onLogout={handleLogout}
+          />
+        ) : view === 'landing' ? (
+          <LandingPage onLogin={() => setView('login')} />
+        ) : (
+          <LoginPage 
+            onSuccess={handleLoginSuccess} 
+            onBack={() => setView('landing')} 
+          />
+        )}
+      </div>
+    </SecurityMiddleware>
   );
 };
 
