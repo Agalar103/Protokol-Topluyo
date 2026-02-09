@@ -129,8 +129,9 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isServerSettingsOpen, setIsServerSettingsOpen] = useState(false);
   
+  // Herkesin mikrofon ve kamerası kapalı başlar
   const [voiceState, setVoiceState] = useState<VoiceState>({
-    isMuted: false, isDeafened: false, isVideoOn: false, isBackgroundBlurred: true
+    isMuted: true, isDeafened: false, isVideoOn: false, isBackgroundBlurred: true
   });
 
   const [screenShare, setScreenShare] = useState<ScreenShareState>({
