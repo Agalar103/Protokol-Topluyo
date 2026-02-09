@@ -60,7 +60,11 @@ const App: React.FC = () => {
       <CustomCursor />
       <div className="h-screen w-full bg-[#0f051a] overflow-hidden">
         {view === 'profile' && viewedUser ? (
-          <ProfileView user={viewedUser} onBack={() => setView('main')} />
+          <ProfileView 
+            user={viewedUser} 
+            onBack={() => setView('main')} 
+            onUpdateUser={handleUpdateUser}
+          />
         ) : view === 'main' && currentUser && selectedServerId ? (
           <MainInterface 
             user={currentUser} 

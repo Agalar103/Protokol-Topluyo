@@ -108,7 +108,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
 
   const runDemoChat = async () => {
     const scripts = [
-      { botId: 'bot-baris', text: "Dostlar, bugün Topluyo ağında bir aradayız. Geleceğin topluluk mimarisi burada şekilleniyor. Tasarımın ve hızın birleştiği bu nokta muazzam değil mi?" },
+      { botId: 'bot-baris', text: "Dostlar, bugün @Topluyo ağında bir aradayız. Geleceğin topluluk mimarisi burada şekilleniyor. Tasarımın ve hızın birleştiği bu nokta muazzam değil mi? https://topluyo.com" },
       { botId: 'bot-jaho', text: "Barış abi hoşgeldin. Mimari falan güzel de, şu piyasanın halini ne yapacağız? Steam dolar oldu, Topluyo'daki Nos Market fiyatları bile daha uygun valla şaka gibi.", yt: true },
       { botId: 'bot-wtcn', text: "Abi bırak piyasayı, dün Valorant'ta attığım ace'i izleyen var mı? Ferit girdi odaya, ortalık karıştı! Linki buraya bıraktım, gurme vuruşlar var.", yt: true, gifIdx: 0 },
       { botId: 'bot-kemal', text: "LAN! NE ACE'İ? Benim ses kartı yine p*ç oldu ağlayacağım şimdi a*k! Ferit, bana acil yeni bir setup lazım yoksa kafayı yiyeceğim!", gifIdx: 1 },
@@ -438,9 +438,28 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
     const ytUrl = m.content ? m.content.match(/(https?:\/\/[^\s]+youtube[^\s]+|https?:\/\/youtu\.be\/[^\s]+)/) : null;
     const embedUrl = ytUrl ? getYouTubeEmbedUrl(ytUrl[0]) : null;
 
+    // Mesaj içeriğini parçala ve linkleri/etiketleri renklendir
+    const parseText = (text: string) => {
+      const parts = text.split(/(\s+)/);
+      return parts.map((part, i) => {
+        // Link Kontrolü (Mavi)
+        if (part.match(/^https?:\/\//)) {
+          return <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline cursor-pointer">{part}</a>;
+        }
+        // Etiket Kontrolü (Kırmızı @kullanıcı)
+        if (part.startsWith('@') && part.length > 1) {
+          return <span key={i} className="text-red-500 font-black italic hover:bg-red-500/10 rounded px-1 cursor-help">{part}</span>;
+        }
+        // Normal Yazı (Beyaz)
+        return <span key={i} className="text-white">{part}</span>;
+      });
+    };
+
     return (
       <div className="space-y-3">
-        <p className={`text-sm leading-relaxed font-medium transition-all group-hover:text-white whitespace-pre-wrap ${m.userId === 'system' ? 'text-red-400 font-black italic border-l-2 border-red-500 pl-3 bg-red-500/5 py-2' : 'text-white/80'}`}>{m.content}</p>
+        <div className={`text-sm leading-relaxed font-medium transition-all group-hover:text-white whitespace-pre-wrap ${m.userId === 'system' ? 'text-red-400 font-black italic border-l-2 border-red-500 pl-3 bg-red-500/5 py-2' : 'text-white'}`}>
+           {m.content ? parseText(m.content) : null}
+        </div>
         {embedUrl && (
           <div className="mt-3 aspect-video w-full max-w-lg border-4 border-white/5 rounded-xl overflow-hidden shadow-2xl">
             <iframe
