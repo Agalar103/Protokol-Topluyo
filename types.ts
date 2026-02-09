@@ -107,5 +107,6 @@ export interface MarketItem {
   name: string;
   price: string;
   image: string;
-  category: 'Steam' | 'Valorant' | 'Diğer';
+  // Fixed: added 'Merch' to allowed categories to match usage in StoreArea
+  category: 'Steam' | 'Valorant' | 'Merch' | 'Diğer';
 }
