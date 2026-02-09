@@ -12,6 +12,8 @@ interface VoiceAreaProps {
   currentMusic?: { title: string, url: string, isPlaying: boolean } | null;
 }
 
+const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts-neutral/svg?seed=user";
+
 const QUALITY_OPTIONS = [
   { label: '720p 30fps', res: '720p', fps: 30 },
   { label: '1080p 60fps', res: '1080p', fps: 60 },
@@ -120,7 +122,12 @@ const MemberCard: React.FC<{ member: Member; isCompact?: boolean; isActivePresen
      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
         <span className={`text-[10px] font-black uppercase tracking-widest ${isCompact ? 'opacity-20' : 'opacity-40'}`}>{member.username.toUpperCase()}</span>
      </div>
-     <img src={member.avatar} className={`w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500 ${isCompact ? 'opacity-20 hover:opacity-100' : 'opacity-60'} ${isSpeaking ? 'grayscale-0' : ''}`} alt="" />
+     <img 
+       src={member.avatar} 
+       className={`w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500 ${isCompact ? 'opacity-20 hover:opacity-100' : 'opacity-60'} ${isSpeaking ? 'grayscale-0' : ''}`} 
+       alt="" 
+       onError={(e) => { e.currentTarget.src = FALLBACK_AVATAR; }}
+     />
      
      <div className="absolute inset-x-0 bottom-4 flex items-center justify-center h-12 z-10 pointer-events-none">
         <div className="w-full h-full px-6">
@@ -156,30 +163,52 @@ const VoiceArea: React.FC<VoiceAreaProps> = ({ channel, members, voiceState, set
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
 
+  const safeCleanupMic = async () => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      if (audioContextRef.current.state !== 'closed') {
+        try {
+          await audioContextRef.current.close();
+        } catch (e) {
+          console.debug("AudioContext kapatılamadı:", e);
+        }
+      }
+      audioContextRef.current = null;
+    }
+  };
+
   useEffect(() => {
     const startMic = async () => {
-      // Mikrofon kapatıldığında her şeyi temizle
       if (voiceState.isMuted) {
         setLocalIsSpeaking(false);
         setLocalVolume(0);
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(t => t.stop());
-            streamRef.current = null;
-        }
-        if (audioContextRef.current) {
-            audioContextRef.current.close();
-            audioContextRef.current = null;
-        }
+        await safeCleanupMic();
         return;
       }
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: { 
+            echoCancellation: true, 
+            noiseSuppression: true,
+            autoGainControl: true
+          } 
+        });
         streamRef.current = stream;
         
         const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
         audioContextRef.current = audioCtx;
+        
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
         
         const source = audioCtx.createMediaStreamSource(stream);
         const analyser = audioCtx.createAnalyser();
@@ -202,7 +231,7 @@ const VoiceArea: React.FC<VoiceAreaProps> = ({ channel, members, voiceState, set
           
           const normalizedVolume = maxVal / 255; 
           setLocalVolume(normalizedVolume);
-          setLocalIsSpeaking(normalizedVolume > 0.1); // Daha hassas eşik değeri
+          setLocalIsSpeaking(normalizedVolume > 0.1);
           
           rafRef.current = requestAnimationFrame(checkVolume);
         };
@@ -217,9 +246,7 @@ const VoiceArea: React.FC<VoiceAreaProps> = ({ channel, members, voiceState, set
     startMic();
 
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
-      if (audioContextRef.current) audioContextRef.current.close();
+      safeCleanupMic();
     };
   }, [voiceState.isMuted]);
 

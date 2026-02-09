@@ -14,40 +14,43 @@ interface ChatAreaProps {
   onMusicCommand?: (title: string, url: string, stop?: boolean) => void;
 }
 
+// Görsel hatası durumunda kullanılacak siber avatar
+const FALLBACK_AVATAR = "https://api.dicebear.com/7.x/bottts-neutral/svg?seed=system";
+
 export const BOT_DATA = [
-  // YAYINCILAR (STREAMERS)
+  // YAYINCILAR (STREAMERS) - Güvenilir picsum/dicebear kaynaklarıyla güncellendi
   { 
     id: 'bot-elraenn', 
     username: 'Elraenn', 
-    avatar: 'https://pbs.twimg.com/profile_images/1531604595856416768/0UfO2x_S_400x400.jpg', 
+    avatar: 'https://picsum.photos/seed/tuqkan/400/400', 
     gifs: ['https://media.tenor.com/Y7vM0Ym6V1kAAAAC/elraenn-tu%C4%9Fkan.gif', 'https://media.tenor.com/5U7zBIn_184AAAAd/elraenn.gif'],
     youtube: 'https://www.youtube.com/watch?v=R9j6V8p6T4o'
   },
   { 
     id: 'bot-jaho', 
     username: 'Jahrein', 
-    avatar: 'https://pbs.twimg.com/profile_images/1765406436854968320/6mUf6l9i_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/jaho7/400/400',
     gifs: ['https://media.tenor.com/kE5n-5D7-kYAAAAd/jahrein-jahrein-yay%C4%B1n.gif', 'https://media.tenor.com/X6oB9u2Qx9wAAAAd/jahrein-yay%C4%B1n.gif'],
     youtube: 'https://www.youtube.com/watch?v=4uP2L0kI2wM'
   },
   { 
     id: 'bot-wtcn', 
     username: 'wtcN', 
-    avatar: 'https://pbs.twimg.com/profile_images/1614349195033714688/A68e-BfV_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/ferit-wtcn/400/400',
     gifs: ['https://media.tenor.com/YI56oN72I48AAAAC/ferit-wtcn.gif', 'https://media.tenor.com/V9M-N6V_7t0AAAAC/wtcn-wtcn-dans.gif'],
     youtube: 'https://www.youtube.com/watch?v=Xh6Xv6H7K1E'
   },
   { 
     id: 'bot-kemal', 
     username: 'KendineMüzisyen', 
-    avatar: 'https://pbs.twimg.com/profile_images/1498305809756139520/q5Z6iY_0_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/rakun-kemal/400/400',
     gifs: ['https://media.tenor.com/fUv_G2hW9eMAAAAd/kemal-can-parlak-kendine-m%C3%BCzisyen.gif', 'https://media.tenor.com/0-uS9R9p6UoAAAAd/kemal-can-parlak-kendine-m%C3%BCzisyen.gif'],
     youtube: 'https://www.youtube.com/watch?v=F7L6X8_qVsw'
   },
   { 
     id: 'bot-pelin', 
     username: 'Pqueen', 
-    avatar: 'https://pbs.twimg.com/profile_images/1628122396113117184/Gz5o2_H2_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/pelin-pq/400/400',
     gifs: ['https://media.tenor.com/G6u7K6z7B_YAAAAd/pqueen-pqueen-dans.gif', 'https://media.tenor.com/x3-S9_U3-1YAAAAd/pqueen-yay%C4%B1n.gif'],
     youtube: 'https://www.youtube.com/watch?v=V9X9X9_qVsw'
   },
@@ -55,37 +58,37 @@ export const BOT_DATA = [
   { 
     id: 'bot-baris', 
     username: 'BarışÖzcan', 
-    avatar: 'https://pbs.twimg.com/profile_images/1384061806370844673/T4G-H5jN_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/barisozcan/400/400',
     youtube: 'https://www.youtube.com/watch?v=vV0f49K_pGs'
   },
   { 
     id: 'bot-ruhi', 
     username: 'RuhiÇenet', 
-    avatar: 'https://pbs.twimg.com/profile_images/1544265780519010304/m7z1-nL9_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/ruhi-cenet/400/400',
     youtube: 'https://www.youtube.com/watch?v=9X9X9_qVsw'
   },
   { 
     id: 'bot-orkun', 
     username: 'OrkunIşıtmak', 
-    avatar: 'https://pbs.twimg.com/profile_images/1638102325995028481/VjN_uS9r_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/orkun-isitmak/400/400',
     youtube: 'https://www.youtube.com/watch?v=Xh6Xv6H7K1E'
   },
   { 
     id: 'bot-enes', 
     username: 'EnesBatur', 
-    avatar: 'https://pbs.twimg.com/profile_images/1559196924876115968/vD7w7Y0f_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/enes-batur/400/400',
     youtube: 'https://www.youtube.com/watch?v=R9j6V8p6T4o'
   },
   { 
     id: 'bot-panda', 
     username: 'Pintipanda', 
-    avatar: 'https://pbs.twimg.com/profile_images/1364539659051012097/5_Nl8_pE_400x400.jpg',
+    avatar: 'https://picsum.photos/seed/tuna-panda/400/400',
     youtube: 'https://www.youtube.com/watch?v=4uP2L0kI2wM'
   },
   // NORMAL KULLANICILAR
-  { id: 'bot-savasci', username: 'SiberSavaşçı', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&h=200&auto=format&fit=crop' },
-  { id: 'bot-yolcu', username: 'GeceYolcusu', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&auto=format&fit=crop' },
-  { id: 'bot-kodcu', username: 'KodMeraklısı', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&h=200&auto=format&fit=crop' }
+  { id: 'bot-savasci', username: 'SiberSavaşçı', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Savasci' },
+  { id: 'bot-yolcu', username: 'GeceYolcusu', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Yolcu' },
+  { id: 'bot-kodcu', username: 'KodMeraklısı', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kodcu' }
 ];
 
 const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMessage, onOpenAdminPanel, onOpenReport, onOpenHack, onMusicCommand }) => {
@@ -438,19 +441,15 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
     const ytUrl = m.content ? m.content.match(/(https?:\/\/[^\s]+youtube[^\s]+|https?:\/\/youtu\.be\/[^\s]+)/) : null;
     const embedUrl = ytUrl ? getYouTubeEmbedUrl(ytUrl[0]) : null;
 
-    // Mesaj içeriğini parçala ve linkleri/etiketleri renklendir
     const parseText = (text: string) => {
       const parts = text.split(/(\s+)/);
       return parts.map((part, i) => {
-        // Link Kontrolü (Mavi)
         if (part.match(/^https?:\/\//)) {
           return <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline cursor-pointer">{part}</a>;
         }
-        // Etiket Kontrolü (Kırmızı @kullanıcı)
         if (part.startsWith('@') && part.length > 1) {
           return <span key={i} className="text-red-500 font-black italic hover:bg-red-500/10 rounded px-1 cursor-help">{part}</span>;
         }
-        // Normal Yazı (Beyaz)
         return <span key={i} className="text-white">{part}</span>;
       });
     };
@@ -473,6 +472,15 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
         )}
       </div>
     );
+  };
+
+  const getAvatar = (userId: string) => {
+    if (userId === user.id) return user.avatar;
+    const bot = BOT_DATA.find(b => b.id === userId);
+    if (bot) return bot.avatar;
+    if (userId === 'system') return FALLBACK_AVATAR;
+    if (userId === 'topluyo-ai') return "https://api.dicebear.com/7.x/pixel-art/svg?seed=TopluyoAI";
+    return `https://api.dicebear.com/7.x/identicon/svg?seed=${userId}`;
   };
 
   return (
@@ -499,7 +507,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
          {messages.map((m) => (
            <div key={m.id} className="group flex gap-4 reveal-item">
              <div className="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center border border-white/10 shadow-lg bg-[var(--bg-secondary)] overflow-hidden">
-                <img src={m.userId === user.id ? user.avatar : (BOT_DATA.find(b => b.id === m.userId)?.avatar || (m.userId === 'system' ? 'https://picsum.photos/seed/sys/40/40' : (m.userId === 'topluyo-ai' ? 'https://picsum.photos/seed/ai/40/40' : `https://picsum.photos/seed/${m.userId}/40/40`)))} className="w-full h-full object-cover" alt="" />
+                <img 
+                  src={getAvatar(m.userId)} 
+                  className="w-full h-full object-cover" 
+                  alt="" 
+                  onError={(e) => { e.currentTarget.src = FALLBACK_AVATAR; }}
+                />
              </div>
              <div className="flex-1 min-w-0">
                <div className="flex items-center gap-2 mb-1">
