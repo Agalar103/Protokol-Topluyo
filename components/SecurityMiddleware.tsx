@@ -30,8 +30,31 @@ const SecurityMiddleware: React.FC<SecurityMiddlewareProps> = ({ children }) => 
       }
       localStorage.setItem('nos_active_sessions', (sessions).toString());
 
+      // 3. Perma Ban Check
+      const checkBanStatus = () => {
+        const userStr = localStorage.getItem('nebula_user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          const banList = JSON.parse(localStorage.getItem('topluyo_banlist') || '[]');
+          if (banList.includes(user.username)) {
+             localStorage.removeItem('nebula_user');
+             setErrorReason('AĞDAN KALICI OLARAK UZAKLAŞTIRILDINIZ. (PERMA BAN)');
+             setIsAuthorized(false);
+             return true;
+          }
+        }
+        return false;
+      };
+
+      if (checkBanStatus()) return;
+
+      // Realtime ban monitoring
+      const interval = setInterval(checkBanStatus, 5000);
+
       // Simüle edilen yükleme süresi
       setTimeout(() => setIsAuthorized(true), 800);
+
+      return () => clearInterval(interval);
     };
 
     runSecurityChecks();

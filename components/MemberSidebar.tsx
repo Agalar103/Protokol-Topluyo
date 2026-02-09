@@ -1,15 +1,30 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Server, Role, Member } from '../types';
 
 interface MemberSidebarProps {
   activeServer: Server;
   onMemberClick: (member: Member) => void;
+  onViewProfile?: (member: Member) => void;
+  onSendMessage?: (member: Member) => void;
 }
 
-const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer, onMemberClick }) => {
+const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer, onMemberClick, onViewProfile, onSendMessage }) => {
+  const [contextMenu, setContextMenu] = useState<{ x: number, y: number, member: Member | null }>({ x: 0, y: 0, member: null });
+
+  const handleContextMenu = (e: React.MouseEvent, member: Member) => {
+    e.preventDefault();
+    setContextMenu({ x: e.pageX, y: e.pageY, member });
+  };
+
+  useEffect(() => {
+    const handleClick = () => setContextMenu({ x: 0, y: 0, member: null });
+    window.addEventListener('click', handleClick);
+    return () => window.removeEventListener('click', handleClick);
+  }, []);
+
   return (
-    <div className="hidden xl:flex w-60 bg-[#110524] flex-col border-l border-white/5 shrink-0 overflow-y-auto no-scrollbar">
+    <div className="hidden xl:flex w-60 bg-[#110524] flex-col border-l border-white/5 shrink-0 overflow-y-auto no-scrollbar relative">
       <div className="p-4 space-y-8">
         {activeServer.roles.map(role => {
           const members = activeServer.members.filter(m => m.roleId === role.id);
@@ -27,6 +42,7 @@ const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer, onMemberCli
                   <div 
                     key={member.id} 
                     onClick={() => onMemberClick(member)}
+                    onContextMenu={(e) => handleContextMenu(e, member)}
                     className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-white/5 cursor-pointer group transition-all"
                   >
                     <div className="relative shrink-0">
@@ -52,14 +68,47 @@ const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer, onMemberCli
             </div>
           );
         })}
-
-        <div>
-          <div className="text-[10px] font-black text-white/20 uppercase mb-3 tracking-widest">EKİPLER</div>
-          <div className="flex items-center gap-2 p-2 rounded-xl hover:bg-white/5 cursor-pointer text-xs font-bold text-white/60 transition-all">
-             <span className="text-blue-400 font-black">#</span> DİSCORD AÇILMASIN AQ
-          </div>
-        </div>
       </div>
+
+      {/* Custom Context Menu */}
+      {contextMenu.member && (
+        <div 
+          className="fixed z-[9999] bg-[#0b0314] border-2 border-white/10 shadow-2xl p-2 w-48 animate-in fade-in zoom-in-95 duration-150"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+        >
+          <div className="px-3 py-2 border-b border-white/5 mb-1 flex items-center gap-2">
+             <img src={contextMenu.member.avatar} className="w-4 h-4 rounded-sm" alt="" />
+             <span className="text-[10px] font-black text-white/40 uppercase italic truncate">{contextMenu.member.username}</span>
+          </div>
+          <button 
+            onClick={() => onViewProfile?.(contextMenu.member!)}
+            className="w-full text-left px-3 py-2 text-[11px] font-bold text-white hover:bg-[#ff00ff] transition-all uppercase italic flex items-center justify-between group"
+          >
+            <span>PROFİLE_BAK</span>
+            <span className="opacity-0 group-hover:opacity-100">👁️</span>
+          </button>
+          <button 
+            onClick={() => onSendMessage?.(contextMenu.member!)}
+            className="w-full text-left px-3 py-2 text-[11px] font-bold text-white hover:bg-[#00ffff] hover:text-black transition-all uppercase italic flex items-center justify-between group"
+          >
+            <span>MESAJ_GÖNDER</span>
+            <span className="opacity-0 group-hover:opacity-100">💬</span>
+          </button>
+          <button 
+            className="w-full text-left px-3 py-2 text-[11px] font-bold text-white/40 hover:text-white hover:bg-green-600 transition-all uppercase italic flex items-center justify-between group"
+          >
+            <span>ARKADAŞLIK_İSTEĞİ</span>
+            <span className="opacity-0 group-hover:opacity-100">➕</span>
+          </button>
+          <div className="h-px bg-white/5 my-1" />
+          <button 
+            className="w-full text-left px-3 py-2 text-[11px] font-bold text-red-500/50 hover:text-white hover:bg-red-600 transition-all uppercase italic flex items-center justify-between group"
+          >
+            <span>ENGELLE</span>
+            <span className="opacity-0 group-hover:opacity-100">🚫</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

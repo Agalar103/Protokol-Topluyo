@@ -9,16 +9,36 @@ interface VoiceAreaProps {
   setVoiceState: React.Dispatch<React.SetStateAction<VoiceState>>;
   screenShare: ScreenShareState;
   setScreenShare: React.Dispatch<React.SetStateAction<ScreenShareState>>;
+  currentMusic?: { title: string, url: string, isPlaying: boolean } | null;
 }
 
-const VoiceArea: React.FC<VoiceAreaProps> = ({ channel, members, voiceState, setVoiceState, screenShare, setScreenShare }) => {
+const VoiceArea: React.FC<VoiceAreaProps> = ({ channel, members, voiceState, setVoiceState, screenShare, setScreenShare, currentMusic }) => {
   const isStage = channel.type === ChannelType.STAGE;
-  const [isBotPlaying, setIsBotPlaying] = useState(true);
   
+  const getEmbedUrl = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}?autoplay=1&mute=0&controls=0&rel=0` : null;
+  };
+
+  const musicUrl = currentMusic?.isPlaying && currentMusic?.url ? getEmbedUrl(currentMusic.url) : null;
+
   return (
     <div className="flex-1 flex flex-col bg-[#0b0314] overflow-hidden relative">
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#00ffff]/20 to-transparent animate-shiny" />
       
+      {/* Hidden Music Player */}
+      {musicUrl && (
+          <div className="absolute w-1 h-1 opacity-0 pointer-events-none">
+              <iframe 
+                src={musicUrl}
+                allow="autoplay; encrypted-media; picture-in-picture"
+                referrerPolicy="strict-origin-when-cross-origin"
+                frameBorder="0"
+              />
+          </div>
+      )}
+
       {/* Top Header */}
       <div className="p-8 border-b border-white/5 flex items-center justify-between shrink-0">
          <div className="space-y-1 reveal-item">
@@ -26,10 +46,12 @@ const VoiceArea: React.FC<VoiceAreaProps> = ({ channel, members, voiceState, set
             <p className="text-[10px] font-black text-[#00ffff] uppercase tracking-[0.4em]">{isStage ? 'STAGER_NODE_ACTIVE' : 'VOICE_LINK_ESTABLISHED'}</p>
          </div>
          <div className="flex gap-4">
-           {isBotPlaying && (
+           {currentMusic?.isPlaying && (
               <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-lg flex items-center gap-3 animate-float">
                  <div className="w-2 h-2 bg-pink-500 rounded-full animate-ping" />
-                 <span className="text-[10px] font-black text-white/40 uppercase tracking-widest italic">Music Bot: Rick Astley - Never Gonna Give You Up</span>
+                 <span className="text-[10px] font-black text-white/40 uppercase tracking-widest italic truncate max-w-[300px]">
+                    Music Bot: {currentMusic.title}
+                 </span>
               </div>
            )}
            {isStage && (
@@ -47,12 +69,14 @@ const VoiceArea: React.FC<VoiceAreaProps> = ({ channel, members, voiceState, set
                <div className="space-y-6">
                   <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] italic ml-2">SAHNE / KONUŞMACILAR</p>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                     <div className="aspect-square bg-[#110524] border-4 border-[#ff00ff] relative overflow-hidden group shadow-[0_0_30px_rgba(255,0,255,0.1)] reveal-item">
+                     <div className={`aspect-square bg-[#110524] border-4 relative overflow-hidden group shadow-2xl reveal-item transition-all ${currentMusic?.isPlaying ? 'border-[#ff00ff] shadow-[0_0_30px_rgba(255,0,255,0.2)]' : 'border-white/10'}`}>
                          <div className="w-full h-full flex items-center justify-center bg-black">
-                            <span className="text-4xl animate-bounce">🎵</span>
+                            <span className={`text-4xl ${currentMusic?.isPlaying ? 'animate-bounce' : 'opacity-20'}`}>🎵</span>
                          </div>
                          <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black to-transparent">
-                            <span className="text-xs font-[1000] text-white uppercase italic">MUSIC MASTER BOT</span>
+                            <span className="text-xs font-[1000] text-white uppercase italic">
+                                {currentMusic?.isPlaying ? 'MUSIC MASTER BOT (YAYINDA)' : 'MUSIC MASTER BOT (IDLE)'}
+                            </span>
                          </div>
                      </div>
                      {members.slice(0, 3).map((m, idx) => (
@@ -77,10 +101,16 @@ const VoiceArea: React.FC<VoiceAreaProps> = ({ channel, members, voiceState, set
          ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
                {/* Music Bot Speaker */}
-               <div className="aspect-video bg-[#110524] rounded-2xl border-2 border-[#ff00ff] shadow-[0_0_20px_rgba(255,0,255,0.2)] flex flex-col items-center justify-center gap-4 group relative overflow-hidden reveal-item">
-                  <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center text-4xl shadow-inner group-hover:scale-110 transition-transform">🎵</div>
-                  <span className="text-[10px] font-[1000] text-[#ff00ff] uppercase tracking-widest italic animate-shiny">MUSIC MASTER BOT (YAYINDA)</span>
-                  <div className="absolute inset-0 border-4 border-[#ff00ff]/20 animate-pulse rounded-2xl" />
+               <div className={`aspect-video bg-[#110524] rounded-2xl border-2 shadow-2xl flex flex-col items-center justify-center gap-4 group relative overflow-hidden reveal-item transition-all ${currentMusic?.isPlaying ? 'border-[#ff00ff] shadow-[0_0_30px_rgba(255,0,255,0.2)]' : 'border-white/10'}`}>
+                  <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center text-4xl shadow-inner group-hover:scale-110 transition-transform">
+                      {currentMusic?.isPlaying ? '🎵' : '💤'}
+                  </div>
+                  <span className={`text-[10px] font-[1000] uppercase tracking-widest italic ${currentMusic?.isPlaying ? 'text-[#ff00ff] animate-shiny' : 'text-white/20'}`}>
+                      {currentMusic?.isPlaying ? 'MUSIC MASTER BOT (YAYINDA)' : 'MUSIC MASTER BOT (BEKLEMEDE)'}
+                  </span>
+                  {currentMusic?.isPlaying && (
+                      <div className="absolute inset-0 border-4 border-[#ff00ff]/20 animate-pulse rounded-2xl" />
+                  )}
                </div>
                {members.slice(0, 11).map((m, idx) => (
                   <div key={m.id} className={`aspect-video bg-[#110524] rounded-2xl border-2 transition-all group relative overflow-hidden reveal-item ${m.id === 'admin-1' && !voiceState.isMuted ? 'border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.3)]' : 'border-white/5'}`} style={{ animationDelay: `${idx * 0.05}s` }}>

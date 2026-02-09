@@ -8,12 +8,28 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    :root {
+      --bg-primary: #110524;
+      --bg-secondary: #0b0314;
+      --text-main: #e9d5ff;
+      --accent: #ff00ff;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #0f051a;
-      color: #e9d5ff;
+      background-color: var(--bg-secondary);
+      color: var(--text-main);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      /* Standart imleci geri getirdik */
+      cursor: auto;
+    }
+
+    /* İnteraktif öğelerde standart el imlecini koruyoruz */
+    button, a, [role="button"] {
+      cursor: pointer;
     }
     
     /* Global Scrollbar Styles */
@@ -32,7 +48,6 @@
       background: #6d28d9;
     }
 
-    /* No-Scrollbar Utility */
     .no-scrollbar::-webkit-scrollbar {
       display: none !important;
     }
@@ -41,7 +56,6 @@
       scrollbar-width: none !important;
     }
 
-    /* React Bits Inspired Animations */
     @keyframes shiny-text {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -53,42 +67,6 @@
       -webkit-background-clip: text;
       background-clip: text;
       animation: shiny-text 3s linear infinite;
-    }
-
-    @keyframes border-beam {
-      100% { offset-distance: 100%; }
-    }
-    .border-beam-active::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border: 2px solid transparent;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #ff00ff, #00ffff) border-box;
-      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: destination-out;
-      mask-composite: exclude;
-      animation: border-beam 4s linear infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    .animate-float {
-      animation: float 6s ease-in-out infinite;
-    }
-
-    /* Magnetic Interaction Feel */
-    .magnetic-btn {
-      transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-    .magnetic-btn:hover {
-      transform: scale(1.05) translateY(-2px);
-    }
-    .magnetic-btn:active {
-      transform: scale(0.95);
     }
 
     .reveal-item {

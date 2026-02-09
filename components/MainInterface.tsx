@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import ChannelList from './ChannelList';
-import ChatArea from './ChatArea';
+import ChatArea, { BOT_DATA } from './ChatArea';
 import VoiceArea from './VoiceArea';
 import UserPanel from './UserPanel';
 import UserSettingsModal from './UserSettingsModal';
@@ -14,7 +14,10 @@ import MatchArea from './MatchArea';
 import WalletArea from './WalletArea';
 import QuickChat from './QuickChat';
 import CreateServerModal from './CreateServerModal';
-import { User, Server, Channel, ChannelType, VoiceState, Role, Member, ScreenShareState, Message } from '../types';
+import AdminPanel from './AdminPanel';
+import NetworkReportModal from './NetworkReportModal';
+import HackOverlay from './HackOverlay';
+import { User, Server, Channel, ChannelType, VoiceState, Role, Member, ScreenShareState, Message, MessageType } from '../types';
 
 interface MainInterfaceProps {
   user: User;
@@ -36,11 +39,14 @@ const INITIAL_SERVERS: Server[] = [
     id: 's1', name: 'Topluyo HQ', icon: '⚡', ownerId: 'admin-1', roles: INITIAL_ROLES,
     members: [
       { id: 'admin-1', username: 'AgalarHero', avatar: 'https://picsum.photos/seed/admin/200/200', status: 'online', roleId: 'r1' },
-      { id: 'bot-elraenn', username: 'Elraenn_Bot', avatar: 'https://picsum.photos/seed/elraenn/200/200', status: 'online', roleId: 'r1' },
-      { id: 'bot-jaho', username: 'Jaho_Bot', avatar: 'https://picsum.photos/seed/jaho/200/200', status: 'online', roleId: 'r2' },
-      { id: 'bot-wtcn', username: 'Ferit_Bot', avatar: 'https://picsum.photos/seed/wtcn/200/200', status: 'online', roleId: 'r3' },
-      { id: 'bot-kemal', username: 'Kemal_Bot', avatar: 'https://picsum.photos/seed/kemal/200/200', status: 'online', roleId: 'r3' },
-      { id: 'bot-pelin', username: 'Pqueen_Bot', avatar: 'https://picsum.photos/seed/pelin/200/200', status: 'online', roleId: 'r3' },
+      ...BOT_DATA.map(bot => ({
+        id: bot.id,
+        username: bot.username,
+        avatar: bot.avatar,
+        status: (['bot-elraenn', 'bot-jaho', 'bot-wtcn', 'bot-baris'].includes(bot.id) ? 'online' : 'idle') as any,
+        roleId: bot.id.includes('bot-elraenn') || bot.id.includes('bot-baris') ? 'r1' : (bot.id.includes('bot-jaho') ? 'r2' : 'r3'),
+        customStatus: bot.id.includes('bot-baris') ? 'Gelecek Tasarlanıyor' : (bot.id.includes('bot-jaho') ? 'Drama Analizi' : 'Siber Ağda Aktif')
+      }))
     ],
     channels: [
       { id: 'c1', name: 'manifesto', type: ChannelType.ANNOUNCEMENT },
@@ -59,7 +65,13 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
   const [activeServerId, setActiveServerId] = useState<string>(initialServerId || servers[0].id);
   const [activeDM, setActiveDM] = useState<Member | User | null>(null);
   const [isCreateServerModalOpen, setIsCreateServerModalOpen] = useState(false);
+  const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isHackOpen, setIsHackOpen] = useState(false);
   
+  // Music State
+  const [currentMusic, setCurrentMusic] = useState<{title: string, url: string, isPlaying: boolean} | null>(null);
+
   const [allMessages, setAllMessages] = useState<Record<string, Message[]>>(() => {
     const saved = localStorage.getItem('topluyo_messages_v3');
     if (!saved) return {};
@@ -140,10 +152,10 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
   };
 
   return (
-    <div className="flex h-screen w-full bg-[#0b0314] text-[#e9d5ff] animate-in fade-in duration-500 overflow-hidden relative">
+    <div className="flex h-screen w-full bg-[var(--bg-secondary)] text-[var(--text-main)] animate-in fade-in duration-500 overflow-hidden relative">
       <Sidebar servers={servers} activeServerId={activeServer.id} onServerSelect={handleServerSelect} onAddServer={() => setIsCreateServerModalOpen(true)} onBackToHub={onBackToServers} />
 
-      <div className="w-64 bg-[#110524] flex flex-col border-r border-white/5 shrink-0">
+      <div className="w-64 bg-[var(--bg-primary)] flex flex-col border-r border-white/5 shrink-0">
         <button onClick={() => setIsServerSettingsOpen(true)} className="h-12 px-4 flex items-center justify-between hover:bg-white/5 transition-all font-black text-xs uppercase tracking-widest text-white/80 italic">
           <div className="flex items-center gap-2 truncate">
              {activeServer.ownerId === user.id && <span className="text-[#ff00ff]">👑</span>}
@@ -157,29 +169,65 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
         <UserPanel user={user} voiceState={voiceState} setVoiceState={setVoiceState} onOpenSettings={() => setIsSettingsOpen(true)} onProfileClick={() => onShowProfile(user)} />
       </div>
 
-      <main className="flex-1 flex flex-col min-w-0 bg-[#0b0314] relative">
+      <main className="flex-1 flex flex-col min-w-0 bg-[var(--bg-secondary)] relative">
         {activeChannel.type === ChannelType.MARKET ? <StoreArea /> : 
          activeChannel.type === ChannelType.NITRO ? <NitroArea /> :
          activeChannel.type === ChannelType.MATCH ? <MatchArea /> :
          activeChannel.type === ChannelType.WALLET ? <WalletArea /> :
          activeChannel.type === ChannelType.VOICE || activeChannel.type === ChannelType.STAGE ? (
-          <VoiceArea channel={activeChannel} members={activeServer.members} voiceState={voiceState} setVoiceState={setVoiceState} screenShare={screenShare} setScreenShare={setScreenShare} />
+          <VoiceArea 
+            channel={activeChannel} 
+            members={activeServer.members} 
+            voiceState={voiceState} 
+            setVoiceState={setVoiceState} 
+            screenShare={screenShare} 
+            setScreenShare={setScreenShare}
+            currentMusic={currentMusic}
+          />
         ) : (
           <ChatArea 
             channelId={activeChannel.id} 
             user={user} 
             messages={allMessages[activeChannel.id] || []} 
             onSendMessage={(msg) => handleAddMessage(activeChannel.id, msg)}
+            onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
+            onOpenReport={() => setIsReportOpen(true)}
+            onOpenHack={() => setIsHackOpen(true)}
+            onMusicCommand={(title, url, stop) => {
+              if (stop) setCurrentMusic(null);
+              else setCurrentMusic({ title, url, isPlaying: true });
+            }}
           />
         )}
       </main>
 
-      <MemberSidebar activeServer={activeServer} onMemberClick={(m) => m.id !== user.id ? setActiveDM(m) : onShowProfile(user)} />
+      <MemberSidebar 
+        activeServer={activeServer} 
+        onMemberClick={(m) => m.id !== user.id ? setActiveDM(m) : onShowProfile(user)} 
+        onViewProfile={(m) => onShowProfile(m)}
+        onSendMessage={(m) => setActiveDM(m)}
+      />
 
       {activeDM && <QuickChat currentUser={user} recipient={activeDM} onClose={() => setActiveDM(null)} />}
       {isSettingsOpen && <UserSettingsModal user={user} voiceState={voiceState} setVoiceState={setVoiceState} onUpdateUser={onUpdateUser} onClose={() => setIsSettingsOpen(false)} onLogout={onLogout} />}
       {isServerSettingsOpen && <ServerSettingsModal server={activeServer} onUpdateServer={() => {}} onClose={() => setIsServerSettingsOpen(false)} />}
       {isCreateServerModalOpen && <CreateServerModal onClose={() => setIsCreateServerModalOpen(false)} onCreate={(d) => { /* logic */ }} />}
+      {isReportOpen && <NetworkReportModal onClose={() => setIsReportOpen(false)} />}
+      {isHackOpen && <HackOverlay onClose={() => setIsHackOpen(false)} />}
+      {isAdminPanelOpen && (
+        <AdminPanel 
+          members={activeServer.members} 
+          onClose={() => setIsAdminPanelOpen(false)} 
+          currentUser={user}
+          onSendSystemMessage={(content) => handleAddMessage(activeChannel.id, {
+            id: 'sys-' + Date.now(),
+            userId: 'system',
+            content,
+            type: MessageType.TEXT,
+            timestamp: new Date()
+          })}
+        />
+      )}
     </div>
   );
 };

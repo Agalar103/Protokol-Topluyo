@@ -6,6 +6,7 @@ import LoginPage from './components/LoginPage';
 import ServerSelection from './components/ServerSelection';
 import ProfileView from './components/ProfileView';
 import SecurityMiddleware from './components/SecurityMiddleware';
+import CustomCursor from './components/CustomCursor';
 import { User, Server, Member } from './types';
 
 const App: React.FC = () => {
@@ -56,6 +57,7 @@ const App: React.FC = () => {
 
   return (
     <SecurityMiddleware>
+      <CustomCursor />
       <div className="h-screen w-full bg-[#0f051a] overflow-hidden">
         {view === 'profile' && viewedUser ? (
           <ProfileView user={viewedUser} onBack={() => setView('main')} />

@@ -24,24 +24,33 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onBack }) => {
       return;
     }
 
-    // Admin & Demo Credentials Check
-    const isAdmin = email === 'nana1' && password === 'nana1';
-    const isDemo = email === 'anan' && password === 'anan';
+    // Ban Check
+    const banList = JSON.parse(localStorage.getItem('topluyo_banlist') || '[]');
+    const currentIdentity = mode === 'login' ? email : username;
+    if (banList.includes(currentIdentity)) {
+      setError('AĞDAN KALICI OLARAK UZAKLAŞTIRILDINIZ. (PERMA BAN)');
+      return;
+    }
 
-    if (mode === 'login' && (isAdmin || isDemo)) {
+    // Demo Credentials Check
+    const isAnan = email === 'anan' && password === 'anan';
+    const isNana = email === 'nana' && password === 'nana';
+    const isNanaOld = email === 'nana1' && password === 'nana1';
+
+    if (mode === 'login' && (isAnan || isNana || isNanaOld)) {
+      const targetUser = isAnan ? 'anan' : (isNana ? 'nana' : 'nana1');
       onSuccess({
-        id: isAdmin ? 'admin-1' : 'demo-1',
-        username: isAdmin ? 'nana1' : 'anan',
-        displayName: isAdmin ? 'nana1' : 'ANAN_DEMO',
-        avatar: `https://picsum.photos/seed/${isAdmin ? 'admin' : 'anan'}/200/200`,
-        banner: isAdmin ? 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1200' : undefined,
+        id: targetUser + '-demo-id',
+        username: targetUser,
+        displayName: targetUser.toUpperCase(),
+        avatar: `https://picsum.photos/seed/${targetUser}/200/200`,
         status: 'online',
+        banner: targetUser === 'anan' ? 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1200' : undefined,
       });
       return;
     }
 
     if (email && password && (mode === 'login' || (mode === 'register' && username))) {
-      // For any other login or a new registration
       onSuccess({
         id: Date.now().toString(),
         username: username || email.split('@')[0],
@@ -96,7 +105,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onBack }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-black/40 border-4 border-white/5 p-4 text-yellow-400 font-black outline-none focus:border-yellow-400 focus:shadow-[0_0_20px_rgba(250,204,21,0.1)] transition-all uppercase placeholder-white/5"
-                placeholder={mode === 'login' ? "ID // EMAIL (anan)" : "USER@NEBULA.CORE"}
+                placeholder={mode === 'login' ? "ID // EMAIL" : "USER@NEBULA.CORE"}
                 required
               />
             </div>
