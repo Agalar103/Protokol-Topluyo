@@ -17,7 +17,7 @@ import CreateServerModal from './CreateServerModal';
 import AdminPanel from './AdminPanel';
 import NetworkReportModal from './NetworkReportModal';
 import HackOverlay from './HackOverlay';
-import { User, Server, Channel, ChannelType, VoiceState, Role, Member, ScreenShareState, Message, MessageType } from '../types';
+import { User, Server, Channel, ChannelType, VoiceState, Role, Member, ScreenShareState, Message, MessageType, AuditLog } from '../types';
 
 interface MainInterfaceProps {
   user: User;
@@ -68,9 +68,36 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isHackOpen, setIsHackOpen] = useState(false);
+  const [adminActiveTab, setAdminActiveTab] = useState<'members' | 'logs'>('members');
   
   // Music State
   const [currentMusic, setCurrentMusic] = useState<{title: string, url: string, isPlaying: boolean} | null>(null);
+
+  // Log State
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => {
+    const saved = localStorage.getItem('topluyo_audit_logs');
+    if (!saved) return [];
+    try {
+      return JSON.parse(saved).map((l: any) => ({ ...l, timestamp: new Date(l.timestamp) }));
+    } catch (e) { return []; }
+  });
+
+  const addLog = (action: AuditLog['action'], details: string, rawData?: any) => {
+    const newLog: AuditLog = {
+      id: 'log-' + Date.now() + Math.random(),
+      timestamp: new Date(),
+      userId: user.id,
+      username: user.username,
+      action,
+      details,
+      rawData
+    };
+    setAuditLogs(prev => {
+      const updated = [newLog, ...prev].slice(0, 500); // Max 500 logs
+      localStorage.setItem('topluyo_audit_logs', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const [allMessages, setAllMessages] = useState<Record<string, Message[]>>(() => {
     const saved = localStorage.getItem('topluyo_messages_v3');
@@ -129,7 +156,6 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isServerSettingsOpen, setIsServerSettingsOpen] = useState(false);
   
-  // Herkesin mikrofon ve kamerası kapalı başlar
   const [voiceState, setVoiceState] = useState<VoiceState>({
     isMuted: true, isDeafened: false, isVideoOn: false, isBackgroundBlurred: true
   });
@@ -150,6 +176,15 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
       ...prev,
       [channelId]: [...(prev[channelId] || []), msg]
     }));
+    // Log user messages only
+    if (msg.userId === user.id) {
+      addLog('MESSAGE_SEND', `${activeChannel.name} kanalına mesaj gönderildi: ${msg.content || '[Medya]'}`, { msg, channel: activeChannel.name });
+    }
+  };
+
+  const handleProfileUpdateLog = (updatedUser: User) => {
+    addLog('PROFILE_UPDATE', `Profil güncellendi: ${updatedUser.displayName || updatedUser.username}`, { old: user, new: updatedUser });
+    onUpdateUser(updatedUser);
   };
 
   return (
@@ -191,7 +226,8 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
             user={user} 
             messages={allMessages[activeChannel.id] || []} 
             onSendMessage={(msg) => handleAddMessage(activeChannel.id, msg)}
-            onOpenAdminPanel={() => setIsAdminPanelOpen(true)}
+            onOpenAdminPanel={() => { setAdminActiveTab('members'); setIsAdminPanelOpen(true); }}
+            onOpenLogs={() => { setAdminActiveTab('logs'); setIsAdminPanelOpen(true); }}
             onOpenReport={() => setIsReportOpen(true)}
             onOpenHack={() => setIsHackOpen(true)}
             onMusicCommand={(title, url, stop) => {
@@ -210,7 +246,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
       />
 
       {activeDM && <QuickChat currentUser={user} recipient={activeDM} onClose={() => setActiveDM(null)} />}
-      {isSettingsOpen && <UserSettingsModal user={user} voiceState={voiceState} setVoiceState={setVoiceState} onUpdateUser={onUpdateUser} onClose={() => setIsSettingsOpen(false)} onLogout={onLogout} />}
+      {isSettingsOpen && <UserSettingsModal user={user} voiceState={voiceState} setVoiceState={setVoiceState} onUpdateUser={handleProfileUpdateLog} onClose={() => setIsSettingsOpen(false)} onLogout={onLogout} />}
       {isServerSettingsOpen && <ServerSettingsModal server={activeServer} onUpdateServer={() => {}} onClose={() => setIsServerSettingsOpen(false)} />}
       {isCreateServerModalOpen && <CreateServerModal onClose={() => setIsCreateServerModalOpen(false)} onCreate={(d) => { /* logic */ }} />}
       {isReportOpen && <NetworkReportModal onClose={() => setIsReportOpen(false)} />}
@@ -218,6 +254,9 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
       {isAdminPanelOpen && (
         <AdminPanel 
           members={activeServer.members} 
+          logs={auditLogs}
+          activeTab={adminActiveTab}
+          setActiveTab={setAdminActiveTab}
           onClose={() => setIsAdminPanelOpen(false)} 
           currentUser={user}
           onSendSystemMessage={(content) => handleAddMessage(activeChannel.id, {

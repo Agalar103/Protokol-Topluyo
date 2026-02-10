@@ -9,6 +9,7 @@ interface ChatAreaProps {
   messages: Message[];
   onSendMessage: (msg: Message) => void;
   onOpenAdminPanel?: () => void;
+  onOpenLogs?: () => void;
   onOpenReport?: () => void;
   onOpenHack?: () => void;
   onMusicCommand?: (title: string, url: string, stop?: boolean) => void;
@@ -91,7 +92,7 @@ export const BOT_DATA = [
   { id: 'bot-kodcu', username: 'KodMeraklısı', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kodcu' }
 ];
 
-const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMessage, onOpenAdminPanel, onOpenReport, onOpenHack, onMusicCommand }) => {
+const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMessage, onOpenAdminPanel, onOpenLogs, onOpenReport, onOpenHack, onMusicCommand }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isTyping, setIsTyping] = useState(false);
@@ -174,6 +175,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
       ];
       const adminCommands = [
         "🔸 /admin - Yönetici panelini açar.",
+        "🔸 /log - Tüm kullanıcı eylemlerini (silinen mesajlar dahil) listeler.",
         "🔸 /ban [kullanıcı] perma - Belirtilen kullanıcıyı yasaklar.",
         "🔸 /uba [kullanıcı] - Kullanıcının yasağını kaldırır.",
         "🔸 /rapor - Canlı ağ haritasını ve siber saldırı durumunu açar.",
@@ -276,6 +278,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
           type: MessageType.TEXT,
           timestamp: new Date()
         });
+        return;
+      }
+
+      if (cmd === '/log') {
+        setInputValue('');
+        if (onOpenLogs) onOpenLogs();
         return;
       }
 
@@ -493,7 +501,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
 
       <div className="h-8 bg-[#ff00ff]/10 flex items-center justify-center border-b border-[#ff00ff]/20 shrink-0">
          <p className="text-[10px] font-black text-[#ff00ff] uppercase tracking-[0.3em] italic animate-pulse">
-           CONNECTED AS: {user.username.toUpperCase()} // /demo - /müzik - /stop - /admin - /rapor - /hack - /list
+           CONNECTED AS: {user.username.toUpperCase()} // /demo - /müzik - /stop - /admin - /log - /list
          </p>
       </div>
 

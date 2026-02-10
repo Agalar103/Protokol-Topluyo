@@ -66,6 +66,17 @@ export interface Message {
   mediaUrl?: string;
   type: MessageType;
   timestamp: Date;
+  isDeleted?: boolean;
+}
+
+export interface AuditLog {
+  id: string;
+  timestamp: Date;
+  userId: string;
+  username: string;
+  action: 'MESSAGE_SEND' | 'MESSAGE_DELETE' | 'PROFILE_UPDATE' | 'LOGIN' | 'LOGOUT' | 'WALLET_ACTION';
+  details: string;
+  rawData?: any;
 }
 
 export interface Channel {
