@@ -23,17 +23,20 @@ const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer, onMemberCli
     return () => window.removeEventListener('click', handleClick);
   }, []);
 
+  // Rol sıralamasına göre listele
+  const sortedRoles = [...activeServer.roles].sort((a, b) => a.position - b.position);
+
   return (
     <div className="hidden xl:flex w-60 bg-[#110524] flex-col border-l border-white/5 shrink-0 overflow-y-auto no-scrollbar relative">
       <div className="p-4 space-y-8">
-        {activeServer.roles.map(role => {
+        {sortedRoles.map(role => {
           const members = activeServer.members.filter(m => m.roleId === role.id);
           if (members.length === 0) return null;
 
           return (
             <div key={role.id}>
               <div className="text-[10px] font-black text-white/20 uppercase mb-3 tracking-widest flex items-center gap-2">
-                <span>{role.name}</span>
+                <span style={{ color: role.color }}>{role.name}</span>
                 <span className="w-1 h-1 bg-white/10 rounded-full" />
                 <span>{members.length}</span>
               </div>
@@ -58,6 +61,9 @@ const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer, onMemberCli
                           <div className="w-3 h-3 bg-[#ff66b2] rounded-full flex items-center justify-center shadow-[0_0_5px_rgba(255,102,178,0.5)]">
                             <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                           </div>
+                        )}
+                        {role.id === 'r4' && (
+                          <span className="text-[10px] animate-pulse">✨</span>
                         )}
                       </div>
                       {member.customStatus && <span className="text-[9px] text-white/30 truncate">{member.customStatus}</span>}
@@ -93,12 +99,6 @@ const MemberSidebar: React.FC<MemberSidebarProps> = ({ activeServer, onMemberCli
           >
             <span>MESAJ_GÖNDER</span>
             <span className="opacity-0 group-hover:opacity-100">💬</span>
-          </button>
-          <button 
-            className="w-full text-left px-3 py-2 text-[11px] font-bold text-white/40 hover:text-white hover:bg-green-600 transition-all uppercase italic flex items-center justify-between group"
-          >
-            <span>ARKADAŞLIK_İSTEĞİ</span>
-            <span className="opacity-0 group-hover:opacity-100">➕</span>
           </button>
           <div className="h-px bg-white/5 my-1" />
           <button 

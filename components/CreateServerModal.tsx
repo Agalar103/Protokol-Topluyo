@@ -4,7 +4,7 @@ import { ChannelType, Server, Role } from '../types';
 
 interface CreateServerModalProps {
   onClose: () => void;
-  onCreate: (serverData: Partial<Server> & { isPremium: boolean, customUrl?: string }) => void;
+  onCreate: (serverData: { name: string, icon: string, isPremium: boolean, customUrl?: string }) => void;
 }
 
 const CreateServerModal: React.FC<CreateServerModalProps> = ({ onClose, onCreate }) => {
@@ -49,11 +49,11 @@ const CreateServerModal: React.FC<CreateServerModalProps> = ({ onClose, onCreate
       icon: iconPreview || icon,
       isPremium: tier === 'premium',
       customUrl: tier === 'premium' ? customUrl : undefined
-    } as any);
+    });
   };
 
   return (
-    <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
       
       <div className="relative w-full max-w-2xl bg-[#110524] border-[6px] border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.8)] overflow-hidden">

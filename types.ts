@@ -91,6 +91,8 @@ export interface Server {
   name: string;
   icon: string;
   ownerId: string;
+  inviteUrl: string;
+  isPremium: boolean;
   channels: Channel[];
   roles: Role[];
   members: Member[];
@@ -118,6 +120,5 @@ export interface MarketItem {
   name: string;
   price: string;
   image: string;
-  // Fixed: added 'Merch' to allowed categories to match usage in StoreArea
   category: 'Steam' | 'Valorant' | 'Merch' | 'Diğer';
 }
