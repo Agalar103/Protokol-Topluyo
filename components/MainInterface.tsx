@@ -208,7 +208,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
       <main className="flex-1 flex flex-col min-w-0 bg-[var(--bg-secondary)] relative">
         {activeChannel.type === ChannelType.MARKET ? <StoreArea /> : 
          activeChannel.type === ChannelType.NITRO ? <NitroArea /> :
-         activeChannel.type === ChannelType.MATCH ? <MatchArea /> :
+         activeChannel.type === ChannelType.MATCH ? <MatchArea userMusic={currentMusic} onStartChat={(m) => setActiveDM(m)} /> :
          activeChannel.type === ChannelType.WALLET ? <WalletArea /> :
          activeChannel.type === ChannelType.VOICE || activeChannel.type === ChannelType.STAGE ? (
           <VoiceArea 
