@@ -18,8 +18,13 @@ const App: React.FC = () => {
   useEffect(() => {
     const saved = localStorage.getItem('nebula_user');
     if (saved) {
-      setCurrentUser(JSON.parse(saved));
-      setView('server-selection');
+      try {
+        setCurrentUser(JSON.parse(saved));
+        setView('server-selection');
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+        localStorage.removeItem('nebula_user');
+      }
     }
   }, []);
 

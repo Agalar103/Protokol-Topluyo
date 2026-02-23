@@ -100,14 +100,23 @@ const ServerRulesModal: React.FC<{ serverName: string, onAccept: () => void }> =
 
 const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialServerId, onBackToServers, onUpdateUser, onShowProfile }) => {
   const [servers, setServers] = useState<Server[]>(() => {
-    const saved = localStorage.getItem('topluyo_servers_v2');
-    return saved ? JSON.parse(saved) : INITIAL_SERVERS;
+    try {
+      const saved = localStorage.getItem('topluyo_servers_v2');
+      return saved ? JSON.parse(saved) : INITIAL_SERVERS;
+    } catch (e) {
+      console.error("Failed to parse servers", e);
+      return INITIAL_SERVERS;
+    }
   });
   
   const [activeServerId, setActiveServerId] = useState<string>(initialServerId || servers[0].id);
   const [acceptedRules, setAcceptedRules] = useState<string[]>(() => {
-    const saved = localStorage.getItem('topluyo_accepted_rules');
-    return saved ? JSON.parse(saved) : ['s1'];
+    try {
+      const saved = localStorage.getItem('topluyo_accepted_rules');
+      return saved ? JSON.parse(saved) : ['s1'];
+    } catch (e) {
+      return ['s1'];
+    }
   });
   
   const [isCreateServerModalOpen, setIsCreateServerModalOpen] = useState(false);
@@ -131,7 +140,10 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
     if (!saved) return [];
     try {
       return JSON.parse(saved).map((l: any) => ({ ...l, timestamp: new Date(l.timestamp) }));
-    } catch (e) { return []; }
+    } catch (e) { 
+      console.error("Failed to parse audit logs", e);
+      return []; 
+    }
   });
 
   const addLog = (action: AuditLog['action'], details: string, rawData?: any) => {
@@ -160,7 +172,10 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
         parsed[key] = parsed[key].map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) }));
       });
       return parsed;
-    } catch (e) { return {}; }
+    } catch (e) { 
+      console.error("Failed to parse messages", e);
+      return {}; 
+    }
   });
 
   const activeServer = useMemo(() => {
@@ -317,7 +332,7 @@ const MainInterface: React.FC<MainInterfaceProps> = ({ user, onLogout, initialSe
         {/* Live Support Button */}
         <button 
             onClick={handleSupportClick}
-            className="absolute bottom-6 right-6 w-16 h-16 bg-[#ff00ff] rounded-2xl flex items-center justify-center text-white shadow-[0_0_40px_rgba(255,0,255,0.4)] border-4 border-white/20 hover:scale-110 active:scale-95 transition-all z-50 group overflow-hidden"
+            className="absolute bottom-28 right-6 w-16 h-16 bg-[#ff00ff] rounded-2xl flex items-center justify-center text-white shadow-[0_0_40px_rgba(255,0,255,0.4)] border-4 border-white/20 hover:scale-110 active:scale-95 transition-all z-50 group overflow-hidden"
         >
             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <svg className="w-8 h-8 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>

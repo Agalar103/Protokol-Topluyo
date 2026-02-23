@@ -551,7 +551,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
               onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(inputValue); }}
             />
             <div className="flex items-center pr-4 gap-2">
-              <button disabled={isThrottled} onClick={() => handleSendMessage(inputValue)} className="bg-[#ff00ff] text-white px-6 py-2 rounded-sm font-[1000] uppercase italic tracking-tighter text-xs shadow-[0_0_15px_rgba(255,0,255,0.4)]">GÖNDER</button>
+              <button disabled={isThrottled} onClick={() => handleSendMessage(inputValue)} className="bg-[#ff00ff] text-white px-8 py-2.5 rounded-xl font-[1000] uppercase italic tracking-tighter text-xs shadow-[0_0_20px_rgba(255,0,255,0.4)] hover:scale-105 active:scale-95 transition-all">GÖNDER</button>
             </div>
          </div>
       </div>

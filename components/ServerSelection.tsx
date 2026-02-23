@@ -85,12 +85,12 @@ const ServerSelection: React.FC<ServerSelectionProps> = ({ user, onSelectServer,
       <div className="fixed inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
       
       {/* Header */}
-      <header className={`flex items-center justify-between mb-8 shrink-0 max-w-[1400px] mx-auto w-full z-10 transition-all duration-300 ${zoomingServerId || isExitingSystem ? 'opacity-0 scale-95 blur-md' : 'opacity-100'}`}>
+      <header className={`flex items-center justify-between mb-8 shrink-0 max-w-[1800px] mx-auto w-full z-10 transition-all duration-300 ${zoomingServerId || isExitingSystem ? 'opacity-0 scale-95 blur-md' : 'opacity-100'}`}>
         <div className="flex items-center gap-4">
-           <div className="w-10 h-10 bg-[#ff00ff] rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(255,0,255,0.6)] transform -rotate-3">
-             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+           <div className="w-12 h-12 bg-[#ff00ff] rounded-lg flex items-center justify-center shadow-[0_0_30px_rgba(255,0,255,0.6)] border-2 border-white/20 transform -rotate-3">
+             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
            </div>
-           <span className="text-3xl font-[1000] uppercase italic tracking-tighter text-[#ff00ff] drop-shadow-[0_0_10px_rgba(255,0,255,0.3)]">TOPLUYO</span>
+           <span className="text-4xl font-[1000] uppercase italic tracking-tighter text-[#ff00ff] drop-shadow-[0_0_15px_rgba(255,0,255,0.4)]">TOPLUYO</span>
         </div>
 
         <div className="flex items-center gap-4 bg-black/60 p-1.5 pr-6 rounded-2xl border-4 border-white/5 backdrop-blur-md group hover:border-[#ff00ff]/20 transition-all cursor-pointer">
@@ -109,20 +109,20 @@ const ServerSelection: React.FC<ServerSelectionProps> = ({ user, onSelectServer,
       </header>
 
       {/* Grid Layout - Updated Ads (Mavi Alanlar) */}
-      <div className={`max-w-[1400px] mx-auto w-full z-10 transition-all duration-500 mb-12 flex gap-6 ${zoomingServerId || isExitingSystem ? 'blur-md pointer-events-none opacity-0' : 'opacity-100'}`}>
+      <div className={`max-w-[1800px] mx-auto w-full z-10 transition-all duration-500 mb-8 flex gap-6 ${zoomingServerId || isExitingSystem ? 'blur-md pointer-events-none opacity-0' : 'opacity-100'}`}>
         
         {/* Ad Billboard 1 (Topluyo Mobile Promo) */}
-        <div className="w-1/5 bg-gradient-to-br from-[#ff00ff]/10 to-indigo-950 border-4 border-[#ff00ff]/30 rounded-3xl overflow-hidden relative group">
+        <div className="w-1/5 h-64 bg-gradient-to-br from-[#ff00ff]/10 to-indigo-950 border-4 border-[#ff00ff]/30 rounded-3xl overflow-hidden relative group">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=400')] bg-cover opacity-20 grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110" />
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-            <span className="text-[9px] font-black text-[#ff00ff] uppercase tracking-[0.4em] italic mb-2">TOPLUYO_MOBILE</span>
-            <p className="text-[11px] font-[1000] text-white uppercase italic leading-tight">YENİ NESİL <br /> MOBİL TERMİNAL</p>
+            <span className="text-[10px] font-black text-[#ff00ff] uppercase tracking-[0.4em] italic mb-2">TOPLUYO_MOBILE</span>
+            <p className="text-sm font-[1000] text-white uppercase italic leading-tight">YENİ NESİL <br /> MOBİL TERMİNAL</p>
           </div>
           <div className="absolute bottom-0 w-full h-1 bg-[#ff00ff] animate-pulse" />
         </div>
 
         {/* Kick Stream Preview */}
-        <div className="flex-1 bg-red-600/5 border-4 border-red-600/20 rounded-3xl overflow-hidden relative group shadow-[0_0_50px_rgba(220,38,38,0.1)]">
+        <div className="flex-1 h-64 bg-red-600/5 border-4 border-red-600/20 rounded-3xl overflow-hidden relative group shadow-[0_0_50px_rgba(220,38,38,0.1)]">
           <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-transparent transition-colors z-10">
              <a 
                href="https://kick.com/asi103" 
@@ -138,20 +138,20 @@ const ServerSelection: React.FC<ServerSelectionProps> = ({ user, onSelectServer,
         </div>
 
         {/* Ad Billboard 2 (Topluyo Desktop Promo) */}
-        <div className="w-1/5 bg-gradient-to-br from-[#00ffff]/10 to-indigo-950 border-4 border-[#00ffff]/30 rounded-3xl overflow-hidden relative group">
+        <div className="w-1/5 h-64 bg-gradient-to-br from-[#00ffff]/10 to-indigo-950 border-4 border-[#00ffff]/30 rounded-3xl overflow-hidden relative group">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=400')] bg-cover opacity-20 grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110" />
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-            <span className="text-[9px] font-black text-[#00ffff] uppercase tracking-[0.4em] italic mb-2">PC_PRO_EXPERIENCE</span>
-            <p className="text-[11px] font-[1000] text-white uppercase italic leading-tight">YÜKSEK HIZLI <br /> DESKTOP AĞI</p>
+            <span className="text-[10px] font-black text-[#00ffff] uppercase tracking-[0.4em] italic mb-2">PC_PRO_EXPERIENCE</span>
+            <p className="text-sm font-[1000] text-white uppercase italic leading-tight">YÜKSEK HIZLI <br /> DESKTOP AĞI</p>
           </div>
           <div className="absolute bottom-0 w-full h-1 bg-[#00ffff] animate-pulse" />
         </div>
       </div>
 
       {/* Streamers Grid */}
-      <div className={`max-w-[1400px] mx-auto w-full z-10 mb-12 ${zoomingServerId || isExitingSystem ? 'opacity-0' : 'opacity-100'}`}>
-        <div className="bg-[#53fc18]/5 border-4 border-[#53fc18]/20 p-8 rounded-3xl overflow-hidden relative">
-          <h2 className="text-xs font-[1000] text-[#53fc18] uppercase italic tracking-[0.5em] mb-8">DİĞER_YAYINCILAR_NODE</h2>
+      <div className={`max-w-[1800px] mx-auto w-full z-10 mb-8 ${zoomingServerId || isExitingSystem ? 'opacity-0' : 'opacity-100'}`}>
+        <div className="bg-[#53fc18]/5 border-4 border-[#53fc18]/20 p-6 rounded-3xl overflow-hidden relative">
+          <h2 className="text-xs font-[1000] text-[#53fc18] uppercase italic tracking-[0.5em] mb-6">DİĞER_YAYINCILAR_NODE</h2>
           <div className="flex gap-8 overflow-x-auto no-scrollbar pb-2">
             {OTHER_STREAMERS.map((streamer, i) => (
               <div key={i} className="flex flex-col items-center gap-3 shrink-0 group cursor-pointer">
@@ -166,9 +166,9 @@ const ServerSelection: React.FC<ServerSelectionProps> = ({ user, onSelectServer,
       </div>
 
       {/* Servers Grid */}
-      <div className={`max-w-[1400px] mx-auto w-full z-10 transition-all duration-500 ${zoomingServerId || isExitingSystem ? 'blur-md pointer-events-none' : ''}`}>
-        <div className="bg-orange-600/5 border-4 border-orange-600/20 p-10 rounded-3xl">
-          <h2 className="text-xs font-[1000] text-orange-600 uppercase italic tracking-[0.5em] mb-10">SİBER_SUNUCULAR_AĞI</h2>
+      <div className={`max-w-[1800px] mx-auto w-full z-10 transition-all duration-500 pb-20 ${zoomingServerId || isExitingSystem ? 'blur-md pointer-events-none' : ''}`}>
+        <div className="bg-orange-600/5 border-4 border-orange-600/20 p-8 rounded-3xl">
+          <h2 className="text-xs font-[1000] text-orange-600 uppercase italic tracking-[0.5em] mb-8">SİBER_SUNUCULAR_AĞI</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {MOCK_SERVERS.map((server, idx) => (
                 <div 

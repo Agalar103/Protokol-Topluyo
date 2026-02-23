@@ -223,7 +223,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                     <h3 className="text-4xl font-[1000] italic uppercase mb-2 tracking-tighter">{plan.name}</h3>
                     <p className="text-6xl font-black mb-10 text-white/90">{plan.price}<span className="text-xs opacity-40">/ay</span></p>
                     <ul className="space-y-4 mb-12 text-xs font-black text-white/40 uppercase italic tracking-widest">
-                      {plan.perks.map(p => <li key={p} className="flex items-center gap-3"><span className="text-[#ff00ff]">></span> {p}</li>)}
+                      {plan.perks.map(p => <li key={p} className="flex items-center gap-3"><span className="text-[#ff00ff]">&gt;</span> {p}</li>)}
                     </ul>
                     <button onClick={onLogin} className="w-full py-5 bg-white text-black font-[1000] uppercase italic tracking-tighter hover:bg-[#ff00ff] hover:text-white transition-all shadow-xl">Sistemi Yükselt</button>
                   </div>

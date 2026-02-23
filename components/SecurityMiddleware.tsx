@@ -11,11 +11,12 @@ const SecurityMiddleware: React.FC<SecurityMiddlewareProps> = ({ children }) => 
 
   useEffect(() => {
     const runSecurityChecks = async () => {
-      // 1. Coğrafi Engelleme Simülasyonu (Türkiye Dışı Yasak)
+      // 1. Coğrafi Engelleme Simülasyonu (Türkiye Dışı Yasak - Dev/Preview için esnetildi)
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const isTurkey = tz.includes('Istanbul') || navigator.language === 'tr-TR';
       
-      if (!isTurkey) {
+      // Geliştirme aşamasında herkesin girebilmesi için bu kontrolü esnetiyoruz
+      if (!isTurkey && process.env.NODE_ENV === 'production') {
         setErrorReason('ERİŞİM_REDDEDİLDİ: TÜRKİYE_DIŞI_BAĞLANTI_YASAKLANMIŞTIR.');
         setIsAuthorized(false);
         return;
