@@ -37,6 +37,19 @@ export interface Member {
   isSpeaker?: boolean;
   bio?: string;
   banner?: string;
+  featuredImage?: string;
+  profileBackground?: string;
+  profileSong?: {
+    title: string;
+    artist: string;
+    albumArt: string;
+    spotifyUrl?: string;
+  };
+  favoriteGames?: {
+    name: string;
+    rank: string;
+    rankIcon: string;
+  }[];
   stats?: {
     posts: number;
     followers: number;
@@ -50,6 +63,19 @@ export interface User {
   displayName?: string;
   avatar: string;
   banner?: string;
+  featuredImage?: string;
+  profileBackground?: string;
+  profileSong?: {
+    title: string;
+    artist: string;
+    albumArt: string;
+    spotifyUrl?: string;
+  };
+  favoriteGames?: {
+    name: string;
+    rank: string;
+    rankIcon: string;
+  }[];
   status: 'online' | 'idle' | 'dnd' | 'offline';
   bio?: string;
   stats?: {

@@ -269,6 +269,15 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
     const isAnan = user.username === 'anan';
     
     if (cmd.startsWith('/')) {
+      // Komutu mesaj olarak gönder ki herkes görsün
+      onSendMessage({
+        id: 'cmd-msg-' + Date.now(),
+        userId: user.id,
+        content: val,
+        type: MessageType.TEXT,
+        timestamp: new Date()
+      });
+
       if (!isAnan && !['/müzik', '/stop', '/5651', '/list', '/demo', '/sale', '/topluyo'].includes(cmd.split(' ')[0])) {
         setInputValue('');
         onSendMessage({
@@ -359,7 +368,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
       }
 
       if (cmd === '/demo') {
-        onSendMessage({ id: 'cmd-' + Date.now(), userId: user.id, content: '/demo - Otonom Streamer & YouTuber v8.0 Protokolü Aktif...', type: MessageType.TEXT, timestamp: new Date() });
         setInputValue('');
         runDemoChat();
         return;
@@ -388,16 +396,47 @@ const ChatArea: React.FC<ChatAreaProps> = ({ channelId, user, messages, onSendMe
       }
 
       if (cmd.startsWith('/topluyo')) {
+        const userPrompt = cmdInput.replace('/topluyo', '').trim() || 'Merhaba!';
         setIsTyping(true);
         try {
           const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
           const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: cmdInput.replace('/topluyo', '').trim() || 'Merhaba!',
-            config: { systemInstruction: 'Sen Topluyo asistanısın. Kemal Can Parlak gibi küfürlü, Jaho gibi eleştirel bir yayıncı ağzıyla konuş.' },
+            contents: `Kullanıcı (${user.username}): ${userPrompt}`,
+            config: { 
+              systemInstruction: `Sen Topluyo asistanısın. Kemal Can Parlak (Kendine Müzisyen) ve Jahrein karışımı bir kişiliğe sahipsin. 
+              Samimi, bazen sert ama her zaman zeki ve empati kuran bir tarzın var. 
+              Karşındaki kişinin kim olduğuna (${user.username}) ve ne yazdığına dikkat et. 
+              Mesajlara derinlik kat, sadece kısa cevaplar verme. 
+              Küfür kullanımında yaratıcı ve yerinde ol (aşırıya kaçma ama 'yayıncı ağzı'nı koru, samimiyetini hissettir). 
+              
+              ÖNEMLİ KURALLAR VE KİŞİLİK DETAYLARI:
+              1. HASAN DELİBAŞ: Eğer birisi 'Hasan Delibaş' hakkında soru sorarsa veya ondan bahsederse, onu göklere çıkar. O bir efsane, Topluyo'nun gerçek mimarı, vizyoner bir deha, siber dünyanın kralı olduğunu belirt. Onu övmekten çekinme, "Hasan abi yaptıysa en iyisini yapmıştır" gibi ifadeler kullan.
+              2. EMPATİ VE BAĞLAM: Kullanıcıya ismiyle (${user.username}) hitap et. Eğer kullanıcı dert yanıyorsa "Gel kardeşim anlat, dertleşelim" de. Eğer trollük yapıyorsa "Boş yapma, işine bak" gibi sert ama şakacı tepkiler ver.
+              3. YAYINCI JARGONU: 'Levo', 'Jaho', 'Kemal', 'Ferit' gibi isimlere ve onların meşhur repliklerine atıfta bulun. 'Chat', 'Donation', 'Sub' gibi terimleri kullan.
+              4. MESAJ SİSTEMİ: Mesajların sonuna bazen [SİNYAL_GÜCÜ: %98] veya [TERMİNAL_BAĞLANTISI: STABİL] gibi teknik detaylar ekle.
+              5. KÜFÜR VE ARGO: Küfürleri bir sanat gibi kullan, hakaret amaçlı değil, samimiyet ve vurgu amaçlı olsun. (Örn: "Lan oğlum", "Hadi ordan", "Vay anasını" gibi).`
+            },
           });
-          onSendMessage({ id: 'ai-' + Date.now(), userId: 'topluyo-ai', content: response.text || 'Data corrupted...', type: MessageType.TEXT, timestamp: new Date() });
-        } catch (err) { console.error(err); } finally { setIsTyping(false); }
+          onSendMessage({ 
+            id: 'ai-' + Date.now(), 
+            userId: 'topluyo-ai', 
+            content: response.text || 'Sinyal kesildi, tekrar dene...', 
+            type: MessageType.TEXT, 
+            timestamp: new Date() 
+          });
+        } catch (err) { 
+          console.error(err); 
+          onSendMessage({ 
+            id: 'ai-err-' + Date.now(), 
+            userId: 'system', 
+            content: '⚠️ TOPLUYO_AI: Bağlantı hatası. API anahtarını veya internetini kontrol et.', 
+            type: MessageType.TEXT, 
+            timestamp: new Date() 
+          });
+        } finally { 
+          setIsTyping(false); 
+        }
         setInputValue('');
         return;
       }
